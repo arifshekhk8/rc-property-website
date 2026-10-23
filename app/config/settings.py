@@ -10,19 +10,31 @@ from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 WORKSPACE = BASE_DIR.parent
-DEBUG = os.getenv("DJANGO_DEBUG", "1") == "1"
+DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
     if not DEBUG:
         raise ImproperlyConfigured("DJANGO_SECRET_KEY is required outside local development.")
     secret_file = WORKSPACE / ".runtime" / "dev-secret"
     secret_file.parent.mkdir(exist_ok=True)
-    if not secret_file.exists():
+    try:
         with open(secret_file, "x", opener=lambda p, f: os.open(p, f, 0o600)) as stream:
             stream.write(get_random_secret_key())
+    except FileExistsError:
+        pass
     SECRET_KEY = secret_file.read_text()
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+if not DEBUG and (
+    len(SECRET_KEY) < 50 or len(set(SECRET_KEY)) < 5 or SECRET_KEY.startswith("django-insecure-")
+):
+    raise ImproperlyConfigured("Use a strong, unique production DJANGO_SECRET_KEY.")
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1" if DEBUG else "").split(",")
+    if host.strip()
+]
+if not DEBUG and (not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS):
+    raise ImproperlyConfigured("Set explicit production DJANGO_ALLOWED_HOSTS without '*'.")
 CSRF_TRUSTED_ORIGINS = [v for v in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") if v]
 INSTALLED_APPS = [
     "config.apps.StaffAdminConfig",
@@ -75,6 +87,9 @@ if database_url:
     parsed = urlsplit(database_url)
     if parsed.scheme not in ("postgres", "postgresql"):
         raise ImproperlyConfigured("DATABASE_URL must identify PostgreSQL.")
+    database_sslmode = os.getenv("DATABASE_SSLMODE", "prefer" if DEBUG else "require")
+    if not DEBUG and database_sslmode not in {"require", "verify-ca", "verify-full"}:
+        raise ImproperlyConfigured("Production PostgreSQL requires TLS.")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -84,7 +99,7 @@ if database_url:
             "HOST": parsed.hostname or "localhost",
             "PORT": parsed.port or 5432,
             "CONN_MAX_AGE": 60,
-            "OPTIONS": {"sslmode": os.getenv("DATABASE_SSLMODE", "prefer" if DEBUG else "require")},
+            "OPTIONS": {"sslmode": database_sslmode},
         }
     }
 elif DEBUG:

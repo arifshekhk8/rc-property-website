@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.http import require_GET, require_http_methods
 from projects.models import Project
 
@@ -57,11 +58,13 @@ def about(request):
     return render(request, "website/about.html", {"active": "about"})
 
 
+@sensitive_post_parameters()
 @require_http_methods(["GET", "POST"])
 def contact(request):
     return inquiry(request, contact_page=True)
 
 
+@sensitive_post_parameters()
 @require_http_methods(["GET", "POST"])
 def inquiry(request, contact_page=False):
     # Foundation preview only: never store, log or send form fields, even when submitted.
