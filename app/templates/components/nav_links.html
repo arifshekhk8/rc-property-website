@@ -1,0 +1,5 @@
+<a href="{% url 'home' %}"{% if active == 'home' %} class="active" aria-current="page"{% endif %}>{{ copy.home }}</a>
+<a href="{% url 'projects' %}"{% if active == 'projects' %} class="active" aria-current="page"{% endif %}>{{ copy.projects }}</a>
+<a href="{% url 'gallery' %}"{% if active == 'gallery' %} class="active" aria-current="page"{% endif %}>{{ copy.gallery }}</a>
+<a href="{% url 'about' %}"{% if active == 'about' %} class="active" aria-current="page"{% endif %}>{{ copy.about }}</a>
+<a href="{% url 'contact' %}"{% if active == 'contact' %} class="active" aria-current="page"{% endif %}>{{ copy.contact }}</a>

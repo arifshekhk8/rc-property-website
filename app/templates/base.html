@@ -1,0 +1,39 @@
+{% load static %}<!doctype html>
+<html lang="{{ language }}">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}RC Property · {{ copy.hero_title }}{% endblock %}</title>
+  <meta name="description" content="{{ copy.about_intro }}">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#123B5D">
+  <link rel="icon" href="{% static 'images/favicon.png' %}">
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+  <script src="{% static 'js/site.js' %}" defer></script>
+  {% block head %}{% endblock %}
+</head>
+<body>
+<a class="skip-link" href="#main">{{ copy.skip }}</a>
+<div class="preview-strip">{{ copy.sample_notice }}</div>
+<header class="site-header">
+  <div class="header-inner wrap">
+    <a class="brand" href="{% url 'home' %}" aria-label="RC Property — {{ copy.home }}"><img src="{% static 'images/logo.webp' %}" width="280" height="59" alt="RC Property Development Ltd."></a>
+    <nav class="desktop-nav" aria-label="{{ copy.menu }}">{% include 'components/nav_links.html' %}</nav>
+    <div class="header-tools"><a class="language-switch" href="{{ language_url }}" lang="{{ other_language }}">{{ other_language_label }} <span aria-hidden="true">↗</span></a>
+      <details class="mobile-nav"><summary><span aria-hidden="true">☰</span> {{ copy.menu }}</summary><nav aria-label="{{ copy.menu }}">{% include 'components/nav_links.html' %}</nav></details>
+    </div>
+  </div>
+</header>
+<main id="main">{% block content %}{% endblock %}</main>
+<footer class="site-footer"><div class="wrap footer-top">
+  <div><a class="footer-brand" href="{% url 'home' %}"><img src="{% static 'images/logo.webp' %}" width="240" height="50" alt="RC Property Development Ltd."></a><p>{{ copy.footer_tag }}</p></div>
+  <div class="footer-links"><a href="{% url 'projects' %}">{{ copy.projects }}</a><a href="{% url 'contact' %}">{{ copy.contact }}</a><a href="{% url 'privacy' %}">{{ copy.privacy }}</a><a href="{% url 'terms' %}">{{ copy.terms }}</a></div>
+</div><div class="wrap footer-bottom"><span>© {% now 'Y' %} RC Property</span><span>{{ copy.footer_note }}</span></div></footer>
+<button class="assistant-launcher" data-open-guide aria-haspopup="dialog"><span class="chat-symbol" aria-hidden="true">✦</span>{{ copy.ask_ai }}</button>
+<dialog id="guide-dialog" class="guide-dialog" aria-labelledby="guide-title"><form method="dialog"><button class="dialog-close" aria-label="{{ copy.close }}">×</button></form>
+  <span class="eyebrow">{{ copy.guide_demo }}</span><h2 id="guide-title">{{ copy.guide_title }}</h2><p>{{ copy.guide_body }}</p>
+  <div class="guide-links">{% for guide_project in guide_projects %}<a href="{{ guide_project.get_absolute_url }}">{{ guide_project.title }} <span aria-hidden="true">↗</span></a>{% endfor %}</div>
+  <a class="button button-blue full" href="{% url 'inquiry' %}">{{ copy.send_inquiry }} <span aria-hidden="true">→</span></a>
+</dialog>
+<dialog id="photo-dialog" class="photo-dialog" aria-labelledby="photo-caption"><form method="dialog"><button class="photo-close" aria-label="{{ copy.close }}">×</button></form><img id="photo-image" alt=""><div class="photo-bottom"><button class="photo-arrow" data-photo-prev aria-label="{{ copy.previous }}">←</button><p id="photo-caption"></p><button class="photo-arrow" data-photo-next aria-label="{{ copy.next }}">→</button></div></dialog>
+{% block scripts %}{% endblock %}
+</body></html>
