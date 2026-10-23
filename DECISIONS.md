@@ -33,11 +33,13 @@ Record accepted decisions separately from proposed architecture. A new answer ov
 
 | D23 | 23 October 2026 | The user explicitly instructed “Okay lets start” and authorized temporary sample photos, videos and 360° views. This supersedes the earlier design-only implementation hold; preserve supplied originals and use V3 for the local build |
 
+| D24 | 23 October 2026 | The user requested an audit against the original plan/security requirements, updated documentation and multiple focused commits/pushes to a new private repository. This authorizes source remediation and the private remote, not public deployment or company-operating decisions |
+
 ## Recommended technical and design decisions
 
 | ID | Proposal | Rationale / status |
 | --- | --- | --- |
-| P01 | Django 5.2 LTS, Python 3.13, PostgreSQL 17 | Django 5.2.18/Python 3.13 installed locally; PostgreSQL CI configured and production required; local SQLite exception recorded below |
+| P01 | Django 5.2 LTS, Python 3.13, PostgreSQL 17 | Django 5.2.18/Python 3.13.16 installed locally; PostgreSQL CI passed and production required; local SQLite exception recorded below |
 | P02 | Django templates, custom CSS, small JavaScript modules | Implemented without Bootstrap to match V3 with fewer framework defaults; engineering choice, not an additional user requirement |
 | P03 | Focused Django admin instead of a separately built staff dashboard | Fits current inventory; verify usability and roles with staff |
 | P04 | Self-host Pannellum and load media on demand | Uses actual supplied panorama; projection/size and accessibility still need inspection |
@@ -48,7 +50,7 @@ Record accepted decisions separately from proposed architecture. A new answer ov
 | P09 | Darker blue/green UI palette and self-hosted bilingual fonts | Logo colors need different text/button treatment for contrast; design review pending |
 | P10 | Static location information and a user-selected map link initially | Avoid an automatic third-party map embed; accurate coordinates and staff choice still needed |
 | P11 | No filters/search at launch | Superseded gallery restriction: V3 includes dedicated Gallery and Virtual Site Visit pages, now implemented as sample previews |
-| P12 | Company-owned private GitHub repository with automated checks | Supports handover and controlled source access; repository has not been created |
+| P12 | Company-owned private GitHub repository with automated checks | Private arifshekhk8/rc-property-website created with checks/protected main. The connected account has no company organization; ownership transfer and approved maintainers remain pending |
 | P13 | Managed Python hosting, PostgreSQL, protected media, separate staging | Existing hosting details are unavailable; no provider or region selected |
 | P14 | Lead retention 90 days, logs/backups 30 days as discussion defaults | Require documented company purpose, legal review, and operational approval |
 | P15 | Optional Codex Security with a local-first scanner baseline | Plugin available but not confirmed installed/connected; assess code/privacy access before use |
@@ -58,7 +60,7 @@ Record accepted decisions separately from proposed architecture. A new answer ov
 
 ## Implementation choices on 23 October
 
-These are local engineering choices within D23, not company operating approvals. Use custom CSS and self-hosted fonts/viewer; keep the catalog flat with `Project`, `ProjectImage` and `FAQ` models. Local SQLite permits an immediate preview because PostgreSQL/Docker are unavailable on this machine. Production settings require PostgreSQL, and a PostgreSQL 17 CI job is prepared but has not run remotely. Use hashed dependency locks and a local Git repository; no company remote is assumed.
+These are local engineering choices within D23, not company operating approvals. Use custom CSS and self-hosted fonts/viewer; keep the catalog flat with `Project`, `ProjectImage` and `FAQ` models. Local SQLite permits an immediate preview because PostgreSQL/Docker are unavailable on this machine. Production settings require PostgreSQL, and PostgreSQL 17 CI now runs and has passed. Python is pinned to patched 3.13.16 locally and in CI. See SECURITY_AUDIT.md for execution evidence. Use hashed dependency locks, staged/history secret scans and the new private remote. Main requires pull requests and passing checks, with no force-push or deletion. Independent approval is not yet enforced because no approved second maintainer exists; require that before production release.
 
 The first milestone deliberately implements no inquiry persistence or external AI requests while recipients, notices, retention and provider arrangements remain unresolved. This does not change the agreed eventual free-text AI/inquiry requirements. Staff with publishing permission can edit current records; draft revisions/review are the next content milestone. No shared staff credential is created.
 
@@ -87,6 +89,8 @@ Company public pages use RC Property Development Ltd. A public page naming two h
 | 23 October 2026 | User requested removal of duplicate page images from the main design folder | Kept fourteen canonical selected images in V3; archived seven drafts and three homepage alternatives; updated links and manifests. Building the Django project is next |
 
 | 23 October 2026 | User authorized implementation with sample media | Built the first local bilingual Django/catalog/staff-editing milestone. Recorded checks and remaining production work in PROGRESS.md; no remote deployment |
+
+| 23 October 2026 | User requested a security/plan audit and private source history | Remediated publication/deletion/media/configuration gaps, added tests/scans, ran PostgreSQL CI, created the private repo/protected main and documented unresolved launch gates in SECURITY_AUDIT.md |
 
 ## How to add a decision
 

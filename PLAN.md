@@ -6,7 +6,7 @@ The user selected **A / Open Horizon as final for now** and clarified that V3 mu
 
 The user requested approximately one to one-and-a-half months from 15 October. The working plan uses six weeks, targeting 26 November 2026 within an approximate 15–30 November launch window. Dates are planning targets and depend on company responses, usable media, user authorization to implement, and passing release checks.
 
-Schedule checkpoint, 23 October: Phase 1 has begun, including a working catalog/staff-editing slice and sample public/media pages. A local Git repository, locked dependencies and checks exist. Company remote, executed PostgreSQL CI and complete roles/recovery are unfinished. The dates below remain the original baseline and require reassessment as company inputs arrive.
+Schedule checkpoint, 23 October: Phase 1 has begun, including a working catalog/staff-editing slice and sample public/media pages. A local Git repository, locked dependencies and checks exist. A private remote under the user account and executed PostgreSQL CI now exist. Company ownership, approved roles/recovery, independent review and remaining production features are unfinished. The dates below remain the original baseline and require reassessment as company inputs arrive.
 
 ## Milestones
 
@@ -42,11 +42,15 @@ Integrate the AI through the provider adapter with only approved public facts. T
 
 Deploy first to owned staging using synthetic leads. Verify production-like settings, headers, storage access, translated privacy text, backups, and operational alerts. Prepare a specific domain/DNS migration and rollback plan only when hosting information is available.
 
+## Audit checkpoint
+
+The original foundation sequence is now backed by a private repository, executed PostgreSQL checks and focused security remediation; details are in [SECURITY_AUDIT.md](SECURITY_AUDIT.md). This is a development checkpoint. Do not mark the launch roadmap complete on the basis of scanner/test success. Main has automated gates; independent human review remains an explicit requirement before production release.
+
 ## Next implementation milestone
 
 1. Add staff draft revisions, preview/review/publish transitions and focused role tests. Add editable public contacts and dedicated media replacement controls.
 2. Build the consent-based private inquiry inbox with recipient permissions, duplicate/abuse controls, approved notice/retention configuration and deletion. Continue using synthetic test data while company decisions are pending.
-3. Run the integration suite against PostgreSQL, connect a company-owned private remote/CI, then add the AI adapter and factual evaluations after provider arrangements are settled.
+3. Maintain the passing PostgreSQL checks and private remote, settle company ownership/reviewers, then add the AI adapter and factual evaluations after provider arrangements are settled.
 4. Replace samples with approved facts/media, review Bangla copy and mobile accessibility, and complete staging/release checks before production deployment.
 
 ## Definition of done for every feature

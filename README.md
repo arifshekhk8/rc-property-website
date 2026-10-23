@@ -1,6 +1,6 @@
 # RC Property Website
 
-Last updated: 23 October 2026, Asia/Dhaka. Documentation version: 0.8.
+Last updated: 23 October 2026, Asia/Dhaka. Documentation version: 0.9.
 
 This project will help local buyers explore two land listings, publicly named Project 01 and Project 02, see accurate prices and media, and communicate with the company through a Bangla and English AI assistant. The public experience must be welcoming, premium, accessible, fast on mobile, and simple for people aged 35–60. Staff will manage listings and customer interest through a protected administration area. The display naming does not introduce a project/subplot hierarchy.
 
@@ -9,6 +9,8 @@ The group is Real Capita Group. Its public website calls the relevant sister con
 ## Current status
 
 The first local Django build is implemented from the selected **A / Open Horizon** V3 design. It includes English/Bangla public pages, Project 01/02 details, Gallery/lightbox, sample video and a 360° viewer, plus database-backed staff project/FAQ editing with MFA. All project facts and media are labeled samples. The inquiry form is a non-persistent demo, and the AI launcher explains that live AI is pending.
+
+The foundation was audited against the original plan; see [the audit](SECURITY_AUDIT.md). Thirty-four local tests pass; PostgreSQL CI and secret/dependency checks now execute remotely. Full launch approval remains pending.
 
 Open the running preview at [English](http://127.0.0.1:8000/en/) or [Bangla](http://127.0.0.1:8000/bn/). See [local setup and staff access](app/README.md) to restart it or create your own local administrator. Run `./scripts/dev.sh` from this folder after installing the locked dependencies.
 
@@ -22,6 +24,7 @@ The [fourteen selected V3 boards](design/concepts/v3/README.md), earlier V1/V2 p
 | [DESIGN.md](DESIGN.md) | Visual direction, reference websites, colors, typography, and accessibility |
 | [TECH_STACK.md](TECH_STACK.md) | Proposed technologies, modules, data flow, and hosting criteria |
 | [SECURITY.md](SECURITY.md) | Threat model, privacy requirements, security controls, tools, and release checklist |
+| [SECURITY_AUDIT.md](SECURITY_AUDIT.md) | Plan coverage, fixed findings, executed checks and remaining launch gates |
 | [PLAN.md](PLAN.md) | Development sequence, milestones, dependencies, and completion criteria |
 | [PROGRESS.md](PROGRESS.md) | Completed work, verification evidence, current phase, and next actions |
 | [DECISIONS.md](DECISIONS.md) | Accepted scope, recommendations, changes, and pending decisions |
@@ -49,11 +52,11 @@ The [fourteen selected V3 boards](design/concepts/v3/README.md), earlier V1/V2 p
       design/concepts/v3/   14 selected Open Horizon images, review notes and handoff
       design/concepts/v3/archive/   earlier drafts and homepage alternatives
 
-The supplied files remain intact. A local Git repository, virtual environment, application and development database now exist. No GitHub remote, cloud infrastructure, project AI API account or deployment has been configured. Runtime secrets, local databases, uploads and design archives are excluded from source control.
+The supplied files remain intact. A local Git repository, virtual environment, application and development database now exist. The private [GitHub repository](https://github.com/arifshekhk8/rc-property-website) is configured under the user account, with protected main and automated checks. Company ownership/maintainers are pending. No cloud infrastructure, project AI API account or deployment has been configured. Runtime secrets, local databases, uploads, original DOCX/Illustrator references and old design archives are excluded from source control. The fourteen selected V3 boards and their handoff notes are included. V1/V2/archive links refer to the preserved local workspace.
 
 ## Recommended starting architecture
 
-Implemented: Django 5.2.18, Python 3.13, Django templates, custom CSS and small JavaScript modules, with self-hosted fonts/Pannellum. SQLite supports the local preview; PostgreSQL 17 is configured for CI and required outside development. The server-side AI adapter and separate private inquiry service remain planned.
+Implemented: Django 5.2.18, Python 3.13.16, Django templates, custom CSS and small JavaScript modules, with self-hosted fonts/Pannellum. SQLite supports the local preview; PostgreSQL 17 is configured for CI and required outside development. The server-side AI adapter and separate private inquiry service remain planned.
 
 ## Resume and change workflow
 

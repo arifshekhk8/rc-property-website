@@ -8,7 +8,20 @@ Phase 1 is underway. The user authorized building from V3 using sample photos, v
 
 Live inquiry persistence, the private inbox, free-text AI, full draft/review publishing, editable business contacts, dedicated real video/panorama management and production infrastructure are unfinished. No company-owned GitHub remote or deployment exists. The V3 design boards and supplied originals are unchanged.
 
-## First implementation milestone — 23 October
+## Audit and repository checkpoint — 23 October
+
+User requested a plan/security audit, document updates and a private repository with focused commits. [SECURITY_AUDIT.md](SECURITY_AUDIT.md) maps requirements, fixed findings, evidence and remaining launch gates.
+
+- Created [arifshekhk8/rc-property-website](https://github.com/arifshekhk8/rc-property-website) as private. Main requires pull requests and successful django/secrets checks even for admins; force-pushes and deletion are blocked. Company ownership/maintainers and independent approving review remain pending; no collaborator was added.
+- Added staged/full-history Gitleaks scans, checksum-pinned scanner installation, read-only CI permissions, pinned trusted actions, weekly checks and action-update proposals. Runtime secrets, local DB/uploads and original private-reference files are excluded from Git.
+- Fixed live-record direct/bulk deletion authorization, added explicit photo rights/publication approval and protected previews, added DB constraints, hardened production defaults/TLS/hosts/secrets, and extended CSP/no-store/sensitive-field protections. Regression tests accompany the changes.
+- Upgraded the local isolated runtime from Python 3.13.5 to 3.13.16, matching the verified CI interpreter; system Python was preserved. Expanded CSS/JS sources for easier review.
+- **34 local tests passed on Python 3.13.16** (final runtime check: 6.932 s). Ruff, Bandit, pip-audit and full-history Gitleaks passed. The initial [PostgreSQL CI run](https://github.com/arifshekhk8/rc-property-website/actions/runs/39983848657) passed 31 tests; the expanded **34-test PostgreSQL run** also [passed](https://github.com/arifshekhk8/rc-property-website/actions/runs/39985417363), including the full authentication tests on [audit PR #3](https://github.com/arifshekhk8/rc-property-website/pull/3).
+- Synthetic production checks reject unexpected warnings/errors. W005/W021 remain visible domain/TLS decisions for subdomain HSTS/preload; there is no production deployment or independent-review certification.
+
+## First implementation milestone — 23 October (historical checkpoint)
+
+The evidence below records the initial build before the audit above; the audit supersedes its pending-remote/PostgreSQL status.
 
 - Created the local Git repository, Python 3.13 virtual environment, hashed dependency locks, development runner and Django 5.2.18 application/migrations. Local SQLite is an explicitly documented development exception; production requires PostgreSQL and an explicit secret. PostgreSQL 17 CI is prepared but has not executed remotely.
 - Implemented V3 English/Bangla Home, Projects, separate detail records, Gallery/lightbox, media page, About, Contact, demo inquiry/receipt and draft policies using custom CSS, self-hosted fonts and the supplied logo export.
@@ -111,7 +124,7 @@ Latest user direction: implementation is authorized using V3 and temporary sampl
 
 1. Next coding milestone: complete staff draft/review/publish controls and media/contact editing, then the restricted consent-based inquiry inbox with role/abuse/retention tests.
 2. Confirm company recipients, notice/retention, approved contacts and staff responsibilities before collecting real leads. Continue implementation/testing with synthetic records meanwhile.
-3. Run against PostgreSQL and connect a company-owned private remote/CI, then implement the free-text bilingual AI adapter and factual/privacy evaluations once provider arrangements are settled.
+3. Maintain PostgreSQL CI and settle company ownership/independent reviewers, then implement the free-text bilingual AI adapter and factual/privacy evaluations once provider arrangements are settled.
 4. Gather approved facts/media for both projects, review Bangla copy/mobile behavior with the manager, and complete staging, backup/recovery and production checks before release. Reassess the original dates as these inputs arrive.
 
 ## Session log
@@ -127,3 +140,4 @@ Latest user direction: implementation is authorized using V3 and temporary sampl
 | 23 October 2026 | User clarified the full V3 deliverable; completed fourteen selected boards, seven refinements and responsive/interaction handoff while preserving earlier versions/homepage | Review complete V3 with manager, obtain company content/operating inputs, then begin Django foundation when instructed |
 | 23 October 2026 | Cleaned V3 to fourteen canonical selected images; archived earlier alternatives/drafts and updated references | Next task: start the Django project foundation using V3 |
 | 23 October 2026 | User authorized building with sample media; completed the first local Django/catalog/staff-editing milestone, 20 tests and local checks | Review the running bilingual build; next complete staff publishing/media/contact controls and the private inquiry flow, then AI and staging |
+| 23 October 2026 | Audited foundation, fixed security gaps, added real authentication tests, created/pushed private repo with protected main and executed PostgreSQL CI | Continue staff publishing/media/contact and restricted inquiry milestones; company approvals and production checks remain launch gates |
