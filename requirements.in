@@ -1,0 +1,8 @@
+Django>=5.2.18,<5.3
+Pillow>=11.3
+psycopg[binary]>=3.2
+django-two-factor-auth[phonenumberslite]>=1.18.1
+django-axes>=8
+whitenoise>=6.9
+gunicorn>=23
+

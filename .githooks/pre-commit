@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+if command -v gitleaks >/dev/null 2>&1; then
+  scanner=gitleaks
+elif [ -x .runtime/tools/gitleaks ]; then
+  scanner=.runtime/tools/gitleaks
+else
+  echo "Install Gitleaks before committing. See app/README.md." >&2
+  exit 1
+fi
+exec "$scanner" git --pre-commit --staged --redact --no-banner
