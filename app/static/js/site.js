@@ -8,7 +8,13 @@ document.querySelectorAll("dialog").forEach((dialog) => {
   dialog.addEventListener("click", (event) => {
     if (event.target !== dialog) return;
     const bounds = dialog.getBoundingClientRect();
-    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+    if (
+      event.clientX < bounds.left ||
+      event.clientX > bounds.right ||
+      event.clientY < bounds.top ||
+      event.clientY > bounds.bottom
+    )
+      dialog.close();
   });
 });
 
@@ -23,15 +29,27 @@ function displayPhoto(index) {
   img.alt = item.querySelector("img").alt;
   document.querySelector("#photo-caption").textContent = item.dataset.caption;
 }
-photos.forEach((button, index) => button.addEventListener("click", () => {
-  displayPhoto(index);
-  photoDialog.showModal();
-}));
-document.querySelector("[data-photo-prev]")?.addEventListener("click", () => displayPhoto(photoIndex - 1));
-document.querySelector("[data-photo-next]")?.addEventListener("click", () => displayPhoto(photoIndex + 1));
+photos.forEach((button, index) =>
+  button.addEventListener("click", () => {
+    displayPhoto(index);
+    photoDialog.showModal();
+  }),
+);
+document
+  .querySelector("[data-photo-prev]")
+  ?.addEventListener("click", () => displayPhoto(photoIndex - 1));
+document
+  .querySelector("[data-photo-next]")
+  ?.addEventListener("click", () => displayPhoto(photoIndex + 1));
 photoDialog?.addEventListener("keydown", (event) => {
-  if (event.key === "ArrowLeft") { event.preventDefault(); displayPhoto(photoIndex - 1); }
-  if (event.key === "ArrowRight") { event.preventDefault(); displayPhoto(photoIndex + 1); }
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    displayPhoto(photoIndex - 1);
+  }
+  if (event.key === "ArrowRight") {
+    event.preventDefault();
+    displayPhoto(photoIndex + 1);
+  }
 });
 
 const panoramaButton = document.querySelector("#load-panorama");
@@ -51,12 +69,19 @@ panoramaButton?.addEventListener("click", () => {
     try {
       container.replaceChildren();
       const viewer = window.pannellum.viewer("panorama", {
-        type: "equirectangular", panorama: container.dataset.panoramaUrl,
-        autoLoad: true, autoRotate: 0, escapeHTML: true,
-        mouseZoom: false, showFullscreenCtrl: true, showControls: true,
+        type: "equirectangular",
+        panorama: container.dataset.panoramaUrl,
+        autoLoad: true,
+        autoRotate: 0,
+        escapeHTML: true,
+        mouseZoom: false,
+        showFullscreenCtrl: true,
+        showControls: true,
       });
       viewer.on("error", failed);
-    } catch { failed(); }
+    } catch {
+      failed();
+    }
   });
   script.addEventListener("error", failed);
   document.head.append(script);
@@ -70,7 +95,9 @@ document.querySelectorAll("[data-inquiry-form]").forEach((form) => {
     button.textContent = button.dataset.sendingLabel;
   });
 });
-window.addEventListener("pageshow", () => document.querySelectorAll("[data-submit-label]").forEach((button) => {
-  button.disabled = false;
-  button.textContent = button.dataset.submitLabel;
-}));
+window.addEventListener("pageshow", () =>
+  document.querySelectorAll("[data-submit-label]").forEach((button) => {
+    button.disabled = false;
+    button.textContent = button.dataset.submitLabel;
+  }),
+);

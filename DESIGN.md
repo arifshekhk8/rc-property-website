@@ -2,7 +2,7 @@
 
 Last updated: 23 October 2026, Asia/Dhaka. Status: complete V3 design pack ready for review; no interface has been implemented.
 
-The first local implementation is in [app/](app/README.md). It uses custom CSS and generated sample media while actual project assets are pending. Gallery/lightbox and media previews are interactive; AI and inquiry persistence remain explicit preview states. The fourteen V3 design boards remain unchanged.
+The first local implementation is in [app/](app/README.md). It uses custom CSS and generated sample media while actual project assets are pending. Gallery/lightbox and media previews are interactive; AI and inquiry persistence remain explicit preview states. The fourteen V3 design boards remain unchanged. Approved-photo captions/alternative text now follow staff content; a generated fallback remains visibly labeled even when project facts stop being samples. Unapproved/unlicensed uploaded media are absent from public HTML and file routes; see SECURITY_AUDIT.md.
 
 ## Complete V3 design pack: Open Horizon
 

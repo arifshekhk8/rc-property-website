@@ -23,7 +23,7 @@ Last updated: 23 October 2026, Asia/Dhaka.
 | R13 | No customer accounts, customer login, appointment scheduling, online reservation, or payments |
 | R14 | Prioritize UI/UX, accessibility, security, privacy, simplicity, and maintainability |
 | R15 | Deliver in approximately one to one-and-a-half months; a teammate will maintain the site |
-| R16 | Establish the development workflow; a local Git repository now exists, with the company-owned private remote still pending |
+| R16 | Establish the development workflow; a private GitHub remote and protected main now exist under the user account, with company ownership/maintainers pending |
 | R17 | Original design-only instruction: create planning documentation first and preserve supplied files. Implementation hold superseded by R23; preservation remains required |
 | R18 | Use the manager's V1 feedback to reduce homepage text and create a more modern, image-led visual direction; show multiple homepage candidates before developing the approved direction into full V3 |
 | R19 | Add homepage Gallery and Virtual Site Visit sections as included in the selected Open Horizon design; Virtual Site Visit uses the existing video/panorama requirements and comes from feature 8 of the original document |
@@ -32,6 +32,8 @@ Last updated: 23 October 2026, Asia/Dhaka.
 
 | R22 | Keep only fourteen important selected V3 images in the main folder and archive superseded alternatives; completed |
 | R23 | Start building the project from V3 now; use sample photos, videos and 360° imagery until actual project media are supplied later |
+
+| R24 | Recheck implementation against the original plan and security concerns; fix gaps, update documents, and create/push a private repository with focused commits |
 
 The initial “no personal data” answer was clarified: the four minimal lead fields in R12 are permitted after asking the visitor's permission. Identity documents, financial records, addresses, customer uploads, and payment information remain outside scope.
 
@@ -51,12 +53,14 @@ The initial “no personal data” answer was clarified: the four minimal lead f
 | Home | Short visual hero, two listing previews with essential facts, Gallery and Virtual Site Visit sections, concise contact path; minimize prose |
 | Projects | Both listings, Project 01 and Project 02, with photo, location, area, BDT price, availability, and details link |
 | Project detail | Accurate specifications, labeled media, location, status, authoritative price, and interest/contact action |
+| Gallery | Approved project photos with bilingual captions, image labels and a lightbox; samples during development |
+| Virtual Site Visit | User-initiated walkthrough and panorama, with project selection and photo fallback |
 | About | Staff-approved company information and relationship to the group |
 | Contact | Approved business contact and office details; no scheduling system |
 | Privacy | Actual data flows, AI provider disclosure, retention, recipients, and privacy contact |
 | Website Terms | Information accuracy, media labels, and distinction between inquiries and contractual transactions |
 
-The AI assistant is a shared feature, not another navigation item. Videos and panoramas remain available inside the plot detail page and are also proposed in a homepage Virtual Site Visit preview. Gallery is a requested homepage section; a separate gallery page is not yet confirmed. Location information and any future approved brochure belong inside the plot detail page. Gallery navigation may link to the homepage section. Large media remains user initiated.
+The AI assistant is a shared feature, not another navigation item. V3 includes a dedicated Gallery/lightbox page and a Virtual Site Visit page linked from the homepage and each project detail; these sample previews are implemented. Location information belongs inside the project detail page. Public land documents/brochure publication remain outside the initial scope. Large media remains user initiated.
 
 ## Proposed staff functions
 

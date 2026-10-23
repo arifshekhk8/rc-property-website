@@ -31,7 +31,7 @@ The first build uses custom CSS, semantic HTML, native dialogs and a small JavaS
 | Option | Assessment |
 | --- | --- |
 | React or Next.js with a Django API | Adds two application layers, API/auth concerns, and build/deployment work for a small content site; revisit for genuinely complex client workflows |
-| Tailwind CSS | Good for a bespoke design and worth reconsidering if the maintainer knows it; Bootstrap plus custom CSS is the simpler starting proposal while team skills are unknown |
+| Tailwind CSS | Revisit only if the maintainer needs it; the current custom CSS matches V3 without an extra build dependency |
 | Plain custom CSS only | Selected for the first implementation; keeps the V3 presentation and dependency surface small |
 | HTMX | Useful for later partial updates; unnecessary for two listings and a small chat module |
 | Wagtail | Useful for a large editorial site; adds CMS concepts and dependencies not needed for the current inventory |
@@ -51,7 +51,7 @@ Do not introduce a vector database, LangChain, an autonomous agent framework, mi
     static/       project CSS/JS, approved logo exports, vendored libraries/fonts
     tests/        integration, access control, privacy, abuse, and AI evaluation
 
-The implemented code is in app/: config/, website/, projects/, templates/, static/ and tests/. Separate inquiries/ and assistant/ services are still planned. See app/README.md for commands and limits. Runtime Django 5.2.18/Python 3.13, pinned dependencies and PostgreSQL CI configuration are present; the CI service has not yet executed.
+The implemented code is in app/: config/, website/, projects/, templates/, static/ and tests/. Separate inquiries/ and assistant/ services are still planned. See app/README.md for commands and limits. Runtime Django 5.2.18/Python 3.13.16, pinned dependencies and PostgreSQL CI are present; the remote PostgreSQL run has passed. The patched runtime is pinned in .python-version. Staged/full-history Gitleaks, dependency scans and synthetic production checks are included.
 
 ## Data boundaries
 
@@ -107,6 +107,10 @@ Use explicit timeouts, bounded turns and input/output tokens, global and per-ses
 Keep conversational history in volatile browser memory where practical, with bounded server processing and no durable transcript store. Treat any history received from the browser as untrusted input. Avoid provider conversation objects and persisted response chains for this MVP. Set response storage off where supported and distinguish this from provider abuse-monitoring retention.
 
 The provider's [data controls](https://developers.openai.com/api/docs/guides/your-data) state that API data is not used for training by default, but standard abuse-monitoring retention can still apply. Storage settings alone do not establish zero retention. Assess actual account settings, terms, processing location, and Bangladesh transfer requirements before production use.
+
+## Current verification
+
+See [SECURITY_AUDIT.md](SECURITY_AUDIT.md) for plan coverage, fixes and evidence. WSGI defaults to production, rejects weak/missing secrets or wildcard/absent hosts, requires PostgreSQL with TLS, and applies secure cookies and HTTPS settings. Local manage.py commands explicitly default to development. Synthetic configuration checks leave HSTS subdomain/preload decisions visible until company domains are known; no deployed configuration has been verified.
 
 ## Hosting proposal
 

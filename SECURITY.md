@@ -12,11 +12,11 @@ Untrusted inputs include visitor forms and chat, browser-supplied history, URL/q
 
 The AI service receives public facts and screened chat input only. It receives no lead-form data, staff privileges, private documents, database credentials, or write tools. Public anonymity does not remove CSRF, validation, abuse, or privacy requirements.
 
-## First implementation evidence
+## Current implemented controls
 
-The local build applies Django CSRF/escaping, staff MFA, password-login throttling, publication permissions, published-only records/protected image routes, upload verification/re-encoding/metadata removal, generated filenames, secure production cookie/HTTPS settings and a public-page CSP. Staff/account routes use separate admin-compatible policy and no-store responses. Inquiries are preview-only with no contact-field storage/transmission; no external AI provider is connected. Production requires explicit secrets and PostgreSQL.
+The local build applies Django CSRF/escaping, staff MFA, password-login throttling, publication permissions, published-only records/protected image routes, upload verification/re-encoding/metadata removal, generated filenames, secure production cookie/HTTPS settings and a public-page CSP. The self-hosted-script CSP now also covers staff/account routes. Staff/account/contact/inquiry and POST responses are private/no-store; inquiry fields are excluded from Django error reports. Inquiries are preview-only with no contact-field storage/transmission; no external AI provider is connected. Production requires explicit secrets and PostgreSQL.
 
-Twenty integration tests passed locally on SQLite, including direct draft/media isolation, MFA/revocation, permission boundaries, CSRF, escaping, consent and upload checks. Ruff/Bandit passed and pip-audit reported no known locked runtime vulnerabilities. These checks do not cover all release requirements. PostgreSQL execution, a deployed configuration, rate limits on future inquiry/AI endpoints, full role/review workflows, recovery, audit/retention, backup restoration, native-device accessibility and penetration review remain outstanding. See PROGRESS.md and app/README.md for commands and scope.
+Thirty-four integration tests passed locally on patched Python 3.13.16, including actual password/TOTP login, lockout/logout, direct draft/unapproved-media isolation, destructive-action permissions, CSRF, escaping, consent, database constraints and upload checks. PostgreSQL 17 CI now executes remotely. Ruff/Bandit, runtime pip-audit and staged/history Gitleaks passed. The private repo has protected main with required checks, but no independent approving reviewer is assigned. See [SECURITY_AUDIT.md](SECURITY_AUDIT.md) for fixed findings, evidence and remaining launch gates: deployed configuration, future endpoint abuse limits, full roles/review/recovery, audit/retention, backups, native-device accessibility and independent security review remain unfinished.
 
 ## Proposed staff permissions
 
@@ -137,7 +137,7 @@ Recommended Codex skills: use OpenAI Docs for AI API/data-control changes; use s
 | S06 | High | Unreviewed land-document publication could disclose personal/legal information; keep it outside MVP and require review before any expansion |
 | S07 | Medium | Hosting, restoration, and patch ownership are unknown; select accountable staff and verify operations before release |
 
-These are potential-impact planning risks. No code vulnerability is claimed. For each actual finding later, record affected file/version, evidence, severity, exploit conditions, privacy impact, recommended fix, owner, and retest result. Do not repeat secrets or real customer data in reports.
+These are potential-impact planning risks. Actual development-source findings and their fixes are recorded separately in SECURITY_AUDIT.md. For each actual finding later, record affected file/version, evidence, severity, exploit conditions, privacy impact, recommended fix, owner, and retest result. Do not repeat secrets or real customer data in reports.
 
 ## Release checklist
 
