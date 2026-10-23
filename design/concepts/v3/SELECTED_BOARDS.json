@@ -1,0 +1,121 @@
+{
+  "date": "2026-10-23",
+  "timezone": "Asia/Dhaka",
+  "direction": "Open Horizon",
+  "selected_board_count": 14,
+  "boards": [
+    {
+      "board": "01",
+      "title": "Home",
+      "file": "01-home.png",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "bf0e21ba4e27128e463f79077910d2c2b45bfd1f9ec52bcb742d8739a6deb25d"
+    },
+    {
+      "board": "02",
+      "title": "Projects",
+      "file": "02-projects.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "152ab156d030e7f7dc244962c7dc9cec30f7641db53896a6c9b241d5782260ad"
+    },
+    {
+      "board": "03",
+      "title": "Project 01 detail",
+      "file": "03-project-01-details.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "ddc652fdd707077bee0778caadaf361c971448b0083f5fd077224381bf443f87"
+    },
+    {
+      "board": "04",
+      "title": "Project 02 detail",
+      "file": "04-project-02-details.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "af98fe6db5611ad713432e119b5fddc560489dad607fe534bd5fe948e4d09c80"
+    },
+    {
+      "board": "05",
+      "title": "Gallery and photo viewer",
+      "file": "05-gallery.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "197a1f406909aed5f796b7488af8e5660a549843039f5d6aa6e16a75f8889199"
+    },
+    {
+      "board": "06",
+      "title": "Virtual Site Visit",
+      "file": "06-virtual-site-visit.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "13ca8855ac2ae9e43c7e702bede8c89ff3a4436fb2f5014fcd9916cc6a7d8bb2"
+    },
+    {
+      "board": "07",
+      "title": "AI assistant and inquiry",
+      "file": "07-assistant-inquiry.png",
+      "width": 1774,
+      "height": 887,
+      "sha256": "bd280e7066a88f7ccb9e6babc5917749c759cbc603c58f6aba80abca7bfdf029"
+    },
+    {
+      "board": "08",
+      "title": "About and Contact",
+      "file": "08-about-contact.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "45622158f48c034958cf7e97ae42845c632504e56bc167347fbaccf7fce0d5af"
+    },
+    {
+      "board": "09",
+      "title": "Privacy and Terms",
+      "file": "09-privacy-terms.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "4113c066e6013a1ee3e7d05cce0ee00982a2e424bc4919912917e67d3252e0bb"
+    },
+    {
+      "board": "10",
+      "title": "Staff project content",
+      "file": "10-staff-content.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "aecd8c0af33a05bcce8889b09dabcacff72d8b823c08d90df75985eb04f637aa"
+    },
+    {
+      "board": "11",
+      "title": "Staff access and inquiries",
+      "file": "11-staff-access-inquiries.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "59964eff2eb7e09916662e075a35506959d99131df3492bca5e6bb805901f651"
+    },
+    {
+      "board": "12",
+      "title": "Staff FAQs and public contacts",
+      "file": "12-staff-faqs-contacts.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "70ff954b0894202dfdc4a5d8159d78503e441e1b38334d302cb63aafee3853ca"
+    },
+    {
+      "board": "13",
+      "title": "Mobile and Bangla",
+      "file": "13-mobile-bangla.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "ed426a9f61f2f320ba5dbe6dbff181a434656142bf575b4262b806732b42ab07"
+    },
+    {
+      "board": "14",
+      "title": "Feedback and recovery",
+      "file": "14-feedback-recovery.png",
+      "width": 1536,
+      "height": 1024,
+      "sha256": "2bf47a295ed3323fe591dcbfd164472f3dbfef2f8b21f0cbc2dc883993602de8"
+    }
+  ],
+  "organization": "One canonical selected PNG per board in this directory; earlier images in archive/."
+}
