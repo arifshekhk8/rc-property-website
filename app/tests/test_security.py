@@ -4,7 +4,12 @@ import subprocess
 import sys
 from pathlib import Path
 
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test import SimpleTestCase, TestCase
+from django_otp import DEVICE_ID_SESSION_KEY
+from django_otp.oath import totp
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 
 class ConfigurationBoundaryTests(SimpleTestCase):
@@ -82,3 +87,70 @@ class ResponsePrivacyTests(TestCase):
                     self.assertEqual(response.status_code, 422)
                     self.assertEqual(response["Cache-Control"], "no-store, private")
                     self.assertEqual(response.wsgi_request.sensitive_post_parameters, "__ALL__")
+
+
+class AuthenticationFlowTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.password = secrets.token_urlsafe(32)
+        cls.staff = get_user_model().objects.create_user(
+            "authentication-test-staff", password=cls.password, is_staff=True
+        )
+        cls.staff.user_permissions.set(
+            Permission.objects.filter(content_type__app_label="projects")
+        )
+        cls.device = TOTPDevice.objects.create(user=cls.staff, name="default", confirmed=True)
+
+    def password_step(self, password=None):
+        return self.client.post(
+            "/account/login/",
+            {
+                "login_view-current_step": "auth",
+                "auth-username": self.staff.username,
+                "auth-password": self.password if password is None else password,
+            },
+        )
+
+    def token(self):
+        return str(
+            totp(
+                self.device.bin_key,
+                step=self.device.step,
+                t0=self.device.t0,
+                digits=self.device.digits,
+                drift=self.device.drift,
+            )
+        ).zfill(self.device.digits)
+
+    def test_real_password_and_totp_sign_in_followed_by_logout(self):
+        response = self.password_step()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["wizard"]["steps"].current, "token")
+        self.assertNotIn(DEVICE_ID_SESSION_KEY, self.client.session)
+        response = self.client.post(
+            "/account/login/",
+            {"login_view-current_step": "token", "token-otp_token": self.token()},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.client.session[DEVICE_ID_SESSION_KEY], self.device.persistent_id)
+        self.assertEqual(self.client.get("/staff/").status_code, 200)
+        self.assertEqual(self.client.get("/account/logout/").status_code, 405)
+        self.assertEqual(self.client.post("/account/logout/").status_code, 302)
+        self.assertEqual(self.client.get("/staff/").status_code, 302)
+
+    def test_invalid_otp_never_establishes_a_verified_session(self):
+        self.password_step()
+        response = self.client.post(
+            "/account/login/",
+            {"login_view-current_step": "token", "token-otp_token": "invalid-token"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(DEVICE_ID_SESSION_KEY, self.client.session)
+        self.assertEqual(self.client.get("/staff/").status_code, 302)
+
+    def test_password_lockout_blocks_further_sign_in_attempts(self):
+        for _ in range(5):
+            response = self.password_step(password="invalid-test-input")
+        self.assertEqual(response.status_code, 429)
+        self.assertEqual(self.password_step().status_code, 429)
+        self.assertNotIn(DEVICE_ID_SESSION_KEY, self.client.session)
