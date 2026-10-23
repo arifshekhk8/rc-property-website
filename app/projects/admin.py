@@ -11,8 +11,15 @@ class ProjectImageInline(admin.StackedInline):
         "image",
         ("caption_en", "caption_bn"),
         ("alt_en", "alt_bn"),
-        ("illustrative", "rights_confirmed", "order"),
+        ("illustrative", "rights_confirmed", "approved_for_publication", "order"),
     ]
+
+    def get_readonly_fields(self, request, obj=None):
+        return (
+            []
+            if request.user.has_perm("projects.publish_project")
+            else ["approved_for_publication"]
+        )
 
 
 class PublishedContentGuardMixin:

@@ -305,6 +305,8 @@ class MediaBoundaryTests(TestCase):
             caption_bn="নমুনা",
             alt_en="Sample",
             alt_bn="নমুনা",
+            rights_confirmed=True,
+            approved_for_publication=True,
         )
 
     def test_uploaded_photo_is_reencoded_and_metadata_removed(self):
@@ -322,6 +324,43 @@ class MediaBoundaryTests(TestCase):
         self.project.publication = "draft"
         self.project.save()
         self.assertEqual(self.client.get(image.public_url).status_code, 404)
+
+    def test_unapproved_or_unlicensed_media_is_private_and_absent_from_public_pages(self):
+        image = self.make_image()
+        for field in ["rights_confirmed", "approved_for_publication"]:
+            with self.subTest(field=field):
+                setattr(image, field, False)
+                image.save()
+                self.assertEqual(self.client.get(image.public_url).status_code, 404)
+                for path in ["/en/projects/project-01/", "/en/gallery/"]:
+                    self.assertNotContains(self.client.get(path), image.public_url)
+                setattr(image, field, True)
+                image.save()
+
+    def test_verified_staff_can_preview_unapproved_media_but_password_only_cannot(self):
+        image = self.make_image()
+        image.approved_for_publication = False
+        image.save()
+        staff = get_user_model().objects.create_user("media-reviewer", is_staff=True)
+        staff.user_permissions.add(Permission.objects.get(codename="view_projectimage"))
+        device = TOTPDevice.objects.create(user=staff, confirmed=True)
+        self.client.force_login(staff, backend="django.contrib.auth.backends.ModelBackend")
+        self.assertEqual(self.client.get(image.public_url).status_code, 404)
+        session = self.client.session
+        session[DEVICE_ID_SESSION_KEY] = device.persistent_id
+        session.save()
+        response = self.client.get(image.public_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Cache-Control"], "private, no-store")
+
+    def test_uploaded_cover_uses_approved_bilingual_accessible_copy(self):
+        image = self.make_image()
+        image.illustrative = False
+        image.alt_en = "Approved ground photograph"
+        image.alt_bn = "অনুমোদিত ছবি"
+        image.save()
+        self.assertContains(self.client.get("/en/projects/project-01/"), image.alt_en)
+        self.assertContains(self.client.get("/bn/projects/project-01/"), image.alt_bn)
 
     def test_active_content_disguised_as_photo_is_rejected(self):
         image = ProjectImage(

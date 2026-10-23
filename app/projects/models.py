@@ -92,9 +92,40 @@ class Project(models.Model):
         return localized(self, "description")
 
     @property
+    def public_images(self):
+        return [
+            image
+            for image in self.images.all()
+            if image.rights_confirmed and image.approved_for_publication
+        ]
+
+    @property
+    def additional_images(self):
+        return self.public_images[1:]
+
+    @property
+    def cover_image(self):
+        return next(iter(self.public_images), None)
+
+    @property
     def cover_url(self):
-        first = next(iter(self.images.all()), None)
-        return first.public_url if first else static(f"images/{self.sample_asset}.webp")
+        image = self.cover_image
+        return image.public_url if image else static(f"images/{self.sample_asset}.webp")
+
+    @property
+    def cover_is_illustrative(self):
+        return self.cover_image.illustrative if self.cover_image else True
+
+    @property
+    def cover_alt(self):
+        return self.cover_image.alt if self.cover_image else self.cover_caption
+
+    @property
+    def cover_caption(self):
+        if self.cover_image:
+            return self.cover_image.caption
+        label = "নমুনা চিত্র" if (get_language() or "").startswith("bn") else "Sample illustration"
+        return f"{self.title} · {label}"
 
     def get_absolute_url(self):
         return reverse("project_detail", args=[self.slug])
@@ -118,6 +149,9 @@ class ProjectImage(models.Model):
     alt_bn = models.CharField(max_length=240)
     illustrative = models.BooleanField(default=True)
     rights_confirmed = models.BooleanField(default=False)
+    approved_for_publication = models.BooleanField(
+        default=False, help_text="A permitted publisher must approve this image for public display."
+    )
     order = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
@@ -134,6 +168,14 @@ class ProjectImage(models.Model):
     @property
     def public_url(self):
         return reverse("project_image", args=[self.pk])
+
+    @property
+    def is_public(self):
+        return (
+            self.project.publication == Project.Publication.PUBLISHED
+            and self.rights_confirmed
+            and self.approved_for_publication
+        )
 
     def clean(self):
         super().clean()
