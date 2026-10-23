@@ -15,8 +15,6 @@ app/media/
 app/staticfiles/
 node_modules/
 .DS_Store
-design/
-!design/
 design/**
 !design/concepts/
 !design/concepts/v3/
