@@ -15,8 +15,41 @@ class ProjectImageInline(admin.StackedInline):
     ]
 
 
+class PublishedContentGuardMixin:
+    """Publication authority also governs destructive changes to live content."""
+
+    live_filter = {}
+
+    def can_mutate(self, request, obj):
+        return (
+            obj is None
+            or not all(getattr(obj, key) == value for key, value in self.live_filter.items())
+            or request.user.has_perm("projects.publish_project")
+        )
+
+    def has_change_permission(self, request, obj=None):
+        return super().has_change_permission(request, obj) and self.can_mutate(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return super().has_delete_permission(request, obj) and self.can_mutate(request, obj)
+
+    def delete_model(self, request, obj):
+        if not self.can_mutate(request, obj):
+            raise PermissionDenied
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        if (
+            not request.user.has_perm("projects.publish_project")
+            and queryset.filter(**self.live_filter).exists()
+        ):
+            raise PermissionDenied
+        super().delete_queryset(request, queryset)
+
+
 @admin.register(Project)
-class ProjectAdmin(admin.ModelAdmin):
+class ProjectAdmin(PublishedContentGuardMixin, admin.ModelAdmin):
+    live_filter = {"publication": "published"}
     list_display = [
         "title_en",
         "publication",
@@ -47,15 +80,6 @@ class ProjectAdmin(admin.ModelAdmin):
             return ["publication"]
         return []
 
-    def has_change_permission(self, request, obj=None):
-        allowed = super().has_change_permission(request, obj)
-        # Editors cannot silently alter an already-published record before draft revisions exist.
-        return allowed and not (
-            obj
-            and obj.publication == "published"
-            and not request.user.has_perm("projects.publish_project")
-        )
-
     def save_model(self, request, obj, form, change):
         if obj.publication == "published" and not request.user.has_perm("projects.publish_project"):
             raise PermissionDenied
@@ -63,15 +87,10 @@ class ProjectAdmin(admin.ModelAdmin):
 
 
 @admin.register(FAQ)
-class FAQAdmin(admin.ModelAdmin):
+class FAQAdmin(PublishedContentGuardMixin, admin.ModelAdmin):
+    live_filter = {"published": True}
     list_display = ["question_en", "published", "order"]
     fields = ["question_en", "answer_en", "question_bn", "answer_bn", "order", "published"]
 
     def get_readonly_fields(self, request, obj=None):
         return [] if request.user.has_perm("projects.publish_project") else ["published"]
-
-    def has_change_permission(self, request, obj=None):
-        allowed = super().has_change_permission(request, obj)
-        return allowed and not (
-            obj and obj.published and not request.user.has_perm("projects.publish_project")
-        )

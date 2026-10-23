@@ -70,6 +70,11 @@ class Project(models.Model):
     class Meta:
         ordering = ["order", "pk"]
         permissions = [("publish_project", "Can publish project content")]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(price_bdt__gt=0), name="positive_price"),
+            models.CheckConstraint(condition=models.Q(area_katha__gt=0), name="positive_katha"),
+            models.CheckConstraint(condition=models.Q(area_sqft__gt=0), name="positive_sqft"),
+        ]
 
     def __str__(self):
         return self.title_en

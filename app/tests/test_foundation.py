@@ -7,13 +7,13 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
-from django.db import connection
+from django.db import IntegrityError, connection, transaction
 from django.test import Client, TestCase, override_settings
 from django.test.utils import CaptureQueriesContext
 from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from PIL import Image, PngImagePlugin
-from projects.models import Project, ProjectImage
+from projects.models import FAQ, Project, ProjectImage
 from website.forms import InquiryForm
 
 
@@ -147,6 +147,12 @@ class PublicBoundaryTests(TestCase):
         self.assertEqual(response["X-Frame-Options"], "DENY")
         self.assertEqual(response["X-Content-Type-Options"], "nosniff")
 
+    def test_database_rejects_non_positive_price_and_area(self):
+        for field in ["price_bdt", "area_katha", "area_sqft"]:
+            with self.subTest(field=field):
+                with self.assertRaises(IntegrityError), transaction.atomic():
+                    Project.objects.filter(pk=self.first.pk).update(**{field: 0})
+
 
 class StaffBoundaryTests(TestCase):
     @classmethod
@@ -205,6 +211,39 @@ class StaffBoundaryTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.project.refresh_from_db()
         self.assertEqual(self.project.title_en, "Project 01")
+
+    def test_editor_cannot_delete_live_projects_or_faqs_even_with_delete_permission(self):
+        self.editor.user_permissions.add(
+            *Permission.objects.filter(
+                content_type__app_label="projects",
+                codename__in=["delete_project", "view_faq", "change_faq", "delete_faq"],
+            )
+        )
+        self.verified(self.editor, self.editor_device)
+        faq = FAQ.objects.get(published=True)
+        for model, instance in [("project", self.project), ("faq", faq)]:
+            with self.subTest(model=model):
+                response = self.client.post(
+                    f"/staff/projects/{model}/{instance.pk}/delete/", {"post": "yes"}
+                )
+                self.assertEqual(response.status_code, 403)
+                response = self.client.post(
+                    f"/staff/projects/{model}/",
+                    {"action": "delete_selected", "_selected_action": [instance.pk], "post": "yes"},
+                )
+                self.assertEqual(response.status_code, 403)
+                self.assertTrue(type(instance).objects.filter(pk=instance.pk).exists())
+
+    def test_editor_with_delete_permission_can_delete_an_unpublished_draft(self):
+        self.editor.user_permissions.add(Permission.objects.get(codename="delete_project"))
+        self.project.publication = "draft"
+        self.project.save()
+        self.verified(self.editor, self.editor_device)
+        response = self.client.post(
+            f"/staff/projects/project/{self.project.pk}/delete/", {"post": "yes"}
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Project.objects.filter(pk=self.project.pk).exists())
 
     def test_verified_manager_can_edit_project_and_public_page_updates(self):
         self.verified(self.manager, self.manager_device)
