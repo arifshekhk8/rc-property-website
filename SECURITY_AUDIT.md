@@ -1,48 +1,55 @@
-# Foundation Security and Plan Audit
+# Security audit
 
-23 October 2026 · Asia/Dhaka · Development milestone, not production approval.
+Last updated 21 November 2026. These are self-reviews of the development code. They are not penetration tests or certifications, and nothing has been deployed.
 
-The first implementation follows the agreed Django, bilingual catalog and V3 direction. It did not complete the whole launch plan. In particular, the private remote and an executed PostgreSQL integration run were initially unfinished; this audit established both before proceeding to real inquiries or AI. Custom CSS replaced the proposed Bootstrap layer, and SQLite remains a local-only convenience. These engineering choices are recorded in DECISIONS.md.
+## 23 October 2026: foundation audit
 
-## Findings fixed
+We checked the first build against the plan and [SECURITY.md](SECURITY.md) and fixed these:
 
-| ID | Severity and condition | Correction and evidence |
+| ID | Severity and problem | Fix |
 | --- | --- | --- |
-| A01 | Medium: an editor granted delete permission could remove live content despite lacking publication authority | Project/FAQ direct deletion and bulk deletion now require publication authority for live records. Tests verify both denial paths and permitted deletion of a draft |
-| A02 | Medium: a photo attached to a published project could become public without explicit media approval | Both usage rights and publication approval are required. Public HTML, cover selection and the direct file route agree. Only MFA-verified permitted staff can preview unapproved media; preview responses are private/no-store |
-| A03 | High if deployed with missing environment settings: the settings module defaulted to development mode | WSGI now defaults to production and refuses missing/weak secrets, absent/wildcard hosts, SQLite and PostgreSQL without TLS. Local management commands explicitly select development. Subprocess tests verify rejection and valid configuration loading |
-| A04 | Medium defense gap: staff/account pages lacked CSP, and inquiry responses lacked explicit cache prevention | Self-hosted-script CSP now covers staff/account/public routes. Contact/inquiry and all POST responses use private/no-store. Inquiry fields are marked sensitive for Django error reporting |
-| A05 | Medium process gap: secret scanning and PostgreSQL CI had not executed | Gitleaks scans every staged commit and full history in CI. Hash-locked dependencies, Ruff, Bandit, pip-audit, PostgreSQL tests and synthetic production checks now run in GitHub Actions |
-| A06 | Low data-integrity gap: positive price/area rules were enforced by forms but not database constraints | Database check constraints reject zero/negative price and either area measurement even through ORM updates; regression test included |
+| A01 | Medium: an editor with delete permission could delete live content without publish permission | Single and bulk delete of live projects and FAQs now need publish permission. Tested both refusals, and that deleting a draft still works |
+| A02 | Medium: a photo on a published project could go public without explicit approval | Needs both rights confirmed and publication approval. Public pages, cover choice and the file URL all agree. Only MFA-verified staff can preview unapproved photos, with `no-store` |
+| A03 | High if deployed without config: settings defaulted to development mode | `wsgi.py` now defaults to production and refuses a missing or weak secret, missing or wildcard hosts, SQLite, and PostgreSQL without TLS. `manage.py` defaults to development. Tested in subprocesses |
+| A04 | Medium: staff and account pages had no CSP; inquiry responses could be cached | CSP on every route. `no-store` on contact, inquiry and every POST response. Inquiry fields hidden from error reports |
+| A05 | Medium: secret scanning and PostgreSQL CI had never run | Gitleaks on every commit and over full history in CI. CI runs hash-locked installs, Ruff, Bandit, pip-audit, PostgreSQL tests and the production-settings check |
+| A06 | Low: positive price and area were enforced only in forms | Database check constraints added; tested |
 
-These severities describe the conditions in the development source, not evidence of an incident or an exposed production system. No production site was deployed during this work.
+Evidence: 34 tests passed locally and on [PostgreSQL 17 in CI](https://github.com/arifshekhk8/rc-property-website/actions/runs/39985417363) ([PR #3](https://github.com/arifshekhk8/rc-property-website/pull/3)). The earlier [31-test CI run](https://github.com/arifshekhk8/rc-property-website/actions/runs/39983848657) also passed. Ruff, Bandit, pip-audit and full-history Gitleaks were clean.
+
+## 21 November 2026: code review
+
+Arif asked for a senior-level review of everything in the repo: Python, templates, JavaScript, CSS, tests, CI and scripts. We re-ran every CI check locally, and all passed (results in [PROGRESS.md](PROGRESS.md#latest-checks-21-november-2026-local)). No high-severity problems were found.
+
+Changes made in this pass were not security-related: templates re-indented with no output change, and the 404 page given its own text.
+
+### Open findings
+
+| ID | Severity | Problem | Where | Suggested fix |
+| --- | --- | --- | --- | --- |
+| A07 | Medium, before deploying | No `LOGGING` setup and no `500.html`. With DEBUG off and no `ADMINS`, Django records unhandled errors nowhere | `app/config/settings.py` | Log `django` and `django.request` to the console; add a simple bilingual `500.html` |
+| A08 | Low, before deploying | `SECURE_SSL_REDIRECT` sends a 301 to `/health/` when a load balancer checks over plain HTTP | `app/config/settings.py:164` | `SECURE_REDIRECT_EXEMPT = [r"^health/$"]` |
+| A09 | Medium, before deploying | Lockout is keyed on username + `REMOTE_ADDR`. Behind a reverse proxy every visitor shares the proxy's IP, so five wrong passwords for a staff username lock the real person out for 30 minutes | `app/config/middleware.py:1-3`, `app/config/settings.py:135-136` | Read the client IP from the trusted proxy's forwarded header only when the app is behind our proxy |
+| A10 | Low | Phone validation rejects `8801XXXXXXXXX` and `00880…`, both common ways to type a Bangladeshi number | `app/website/forms.py:41` | Also accept a leading `880` or `00880` |
+| A11 | Low | `CSRF_TRUSTED_ORIGINS` entries aren't trimmed, so `a.com, b.com` silently breaks the second origin | `app/config/settings.py:38` | `strip()` each entry, as `ALLOWED_HOSTS` does |
+| A12 | Low | Replacing or deleting a `ProjectImage` leaves the old file on disk | `app/projects/models.py` | Delete the old file on replace and delete |
+| A13 | Nit (accessibility) | The video caption track is labelled "en"/"bn" | `app/templates/website/visit.html` | Use "English" and "বাংলা" |
+| A14 | Nit | `GENERATION_PROMPTS.md` is in `app/static/images/`, so `collectstatic` would publish it | `app/static/images/` | Move it outside `static/` |
 
 ## Plan coverage
 
-| Area | Current state | Remaining launch work |
+| Area | Done | Still needed before launch |
 | --- | --- | --- |
-| Public experience | English/Bangla Home, Projects, both details, Gallery, video/panorama, About/Contact and draft policies; V3 visual direction | Manager review, native Bangla review, real-device accessibility/performance and complete recovery states |
-| Catalog and media | Decimal facts, publication/availability separation, approved media boundary, normalized image uploads | Draft revisions/review, approved contacts/location, dedicated real video/panorama replacement and media lifecycle cleanup |
-| Staff access | Named accounts supported, MFA-gated admin, real password/TOTP/logout and lockout integration tests, publication permissions | Company-approved role assignments, recovery/expiry/access-review drills and infrastructure rate limits |
-| Customer information | No durable inquiry model or chat transcripts; sample form does not save/send contact fields | Restricted inbox, consent evidence, recipient permissions, retention/deletion, duplicate/abuse controls, logging/backup inventory |
-| AI | Explicit preview only; no provider, external request, private-data tool or autonomous action | Provider/transfer/budget decisions, isolated public-fact adapter, quotas, disclosure and bilingual factual/adversarial evaluations |
-| Repository | Private repo, focused commits, pre-commit/history secret scans, protected main, PostgreSQL CI | Transfer to company ownership when available; add approved maintainers and require an independent reviewer |
-| Deployment | Production defaults checked using synthetic configuration | Owned staging, trusted ingress/proxy/IP policy, TLS/database/storage setup, backups/restore, monitoring, rollback and release review |
+| Public site | All pages in both languages with the V3 design; bilingual 404 | Manager and native-Bangla review, real-device accessibility and performance, remaining recovery states |
+| Catalog and media | Decimal facts, publication separate from availability, photo approval, normalised uploads | Draft revisions and review, approved contacts and location, real video and panorama upload, file cleanup (A12) |
+| Staff access | Named accounts, MFA-gated admin, real sign-in, lockout and logout tests, publish permission | Confirmed roles, recovery and access-review drills, proxy-aware lockout (A09), hosting-level rate limits |
+| Customer data | No inquiry storage, no chat transcripts; demo form saves nothing | Restricted inbox, consent record, recipient permissions, retention and deletion, abuse limits, logging and backup inventory |
+| AI | Placeholder only; no provider, requests or tools | Provider, transfer and budget decisions; public-fact adapter; quotas; disclosure; bilingual factual and adversarial tests |
+| Repository | Private repo, focused commits, secret scans, protected `main`, PostgreSQL CI | Transfer to the company; add maintainers; require an independent reviewer |
+| Deployment | Production settings checked with a synthetic config | Staging, proxy and IP policy, TLS, database and storage, logging (A07), health check (A08), backups and restore, monitoring, rollback |
 
-## Verification and boundaries
+## Limits
 
-Local tests: **34 passed** on Python **3.13.16**, using SQLite. The local environment was upgraded from 3.13.5 without changing system Python. Runtime dependencies remain locked with hashes. Ruff, Bandit and runtime pip-audit passed; Gitleaks reported no secrets in the committed history. The initial remote PostgreSQL 17 run passed 31 tests on Python 3.13.16; the expanded **34-test** PostgreSQL 17 suite also passed on [this run](https://github.com/arifshekhk8/rc-property-website/actions/runs/39985417363), including the full authentication flow on [audit PR #3](https://github.com/arifshekhk8/rc-property-website/pull/3).
-
-Evidence: [initial PostgreSQL/security CI run](https://github.com/arifshekhk8/rc-property-website/actions/runs/39983848657), [current workflow](.github/workflows/checks.yml), [integration tests](app/tests/test_foundation.py), [authentication/configuration/privacy tests](app/tests/test_security.py) and [synthetic production check](scripts/check_production.py). CI uses synthetic database credentials and no production secrets. Asset licenses/provenance accompany the self-hosted files. Original materials, V1/V2 archives and the fourteen V3 image hashes remain unchanged.
-
-`security.W005` and `security.W021` remain visible: HSTS coverage of every subdomain and preload must wait for the actual company domain/TLS inventory. The synthetic check reports these two known domain decisions and fails on other warnings/errors; it does not silence them or establish a deployed system's security. Do not enable subdomain HSTS/preload on unverified company domains.
-
-Main requires pull requests and successful `django` and `secrets` checks, including for administrators; force-pushes and deletion are disabled. No second company maintainer is assigned, so the repository currently requires zero approving reviewers. This is **not independent review**. Add the approved teammate and require at least one independent approval before production work is released. No collaborator was invited or granted access during this audit.
-
-This was an implementation self-review and targeted regression testing. It is not a penetration test, ASVS certification, complete privacy-law review or proof of accessibility/performance. The unresolved items above remain acceptance gates, and no production-readiness claim is made.
-
-## Next milestone
-
-Finish staff draft/review/publish and contact/media controls, then build the private inquiry flow using synthetic data. Obtain company roles, recipients, notices and retention before collecting real leads. Add AI only after the private-data boundary and provider decisions are settled. Replace all sample facts/media and complete staging, independent review and recovery/release checks before public launch.
-
-The deployment approach was checked against the [official Django checklist](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/). Repository settings were verified through GitHub's API; see [GitHub's branch-protection guidance](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
+- `security.W005` and `security.W021` (HSTS on subdomains, and preload) stay visible on purpose until we know the company's real domains. Don't enable them on unchecked domains.
+- `main` needs a pull request and passing `django` and `secrets` checks, even for admins, but needs zero approvals because there's no second maintainer yet. That isn't independent review. Add one before anything goes to production.
+- These reviews don't cover a penetration test, ASVS certification, a full privacy-law review, or proof of accessibility and performance.

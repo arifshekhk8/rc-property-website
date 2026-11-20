@@ -1,153 +1,165 @@
-# Security and Privacy Standards
+# Security and privacy
 
-Last updated: 23 October 2026, Asia/Dhaka. Status: baseline controls partly implemented and tested locally; production readiness is not established.
+Last updated 21 November 2026.
 
-Security and privacy are completion requirements for each feature. Use [Django security guidance](https://docs.djangoproject.com/en/5.2/topics/security/), its [deployment checklist](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/), and applicable requirements from [OWASP ASVS 5.0](https://owasp.org/projects/asvs). Recommend ASVS Level 2 coverage for staff access, personal data, and application controls, with applicability recorded; this is a target, not a certification.
+Security and privacy are part of "done" for every feature. References: [Django security](https://docs.djangoproject.com/en/5.2/topics/security/), the [Django deployment checklist](https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/) and [OWASP ASVS 5.0](https://owasp.org/projects/asvs). We aim for ASVS Level 2 on staff access, personal data and application controls. That's a target, not a certification.
 
-## Assets and trust boundaries
+What's been checked, and what's still open, is in [SECURITY_AUDIT.md](SECURITY_AUDIT.md).
 
-Protect staff accounts and MFA secrets, lead names/phone numbers/messages, consent records, unpublished content, prices and availability, storage, backups, API keys, billing limits, and the company's reputation.
+## What we protect
 
-Untrusted inputs include visitor forms and chat, browser-supplied history, URL/query values, uploaded staff media, model output, external URLs, third-party libraries, and imported content. Authenticated staff input still requires validation. Public browsing, the staff area, lead storage, public media, and the external AI service are separate permission/data boundaries.
+Staff accounts and MFA secrets; leads (names, phone numbers, messages) and consent records; unpublished content, prices and availability; storage and backups; API keys and billing limits; the company's reputation.
 
-The AI service receives public facts and screened chat input only. It receives no lead-form data, staff privileges, private documents, database credentials, or write tools. Public anonymity does not remove CSRF, validation, abuse, or privacy requirements.
+**Untrusted input:** visitor forms and chat, browser-sent history, URLs and query strings, staff uploads, model output, external URLs, third-party libraries. Staff input still gets validated.
 
-## Current implemented controls
+**Separate boundaries:** public browsing, the staff area, lead storage, public media and the external AI service. The AI service will receive public facts and screened chat input only: no lead-form data, staff privileges, private documents, database credentials or write tools.
 
-The local build applies Django CSRF/escaping, staff MFA, password-login throttling, publication permissions, published-only records/protected image routes, upload verification/re-encoding/metadata removal, generated filenames, secure production cookie/HTTPS settings and a public-page CSP. The self-hosted-script CSP now also covers staff/account routes. Staff/account/contact/inquiry and POST responses are private/no-store; inquiry fields are excluded from Django error reports. Inquiries are preview-only with no contact-field storage/transmission; no external AI provider is connected. Production requires explicit secrets and PostgreSQL.
+## Controls
 
-Thirty-four integration tests passed locally on patched Python 3.13.16, including actual password/TOTP login, lockout/logout, direct draft/unapproved-media isolation, destructive-action permissions, CSRF, escaping, consent, database constraints and upload checks. PostgreSQL 17 CI now executes remotely. Ruff/Bandit, runtime pip-audit and staged/history Gitleaks passed. The private repo has protected main with required checks, but no independent approving reviewer is assigned. See [SECURITY_AUDIT.md](SECURITY_AUDIT.md) for fixed findings, evidence and remaining launch gates: deployed configuration, future endpoint abuse limits, full roles/review/recovery, audit/retention, backups, native-device accessibility and independent security review remain unfinished.
+| Control | Status | Where |
+| --- | --- | --- |
+| CSRF on every form | Done | Django middleware; tested |
+| Template auto-escaping; staff content escaped in public pages | Done | Tested |
+| Admin requires password + TOTP | Done | `config/admin.py` (`AdminSiteOTPRequired`) |
+| Lockout after 5 failed logins for 30 minutes, keyed on username + IP | Done (see A09) | `AXES_*` in settings |
+| Passwords: at least 12 characters, common, numeric and similarity checks, scrypt hashing | Done | settings |
+| Sessions: 1 hour, HttpOnly, SameSite=Lax, Secure in production | Done | settings |
+| Production refuses weak or missing secret, missing or wildcard hosts, SQLite, PostgreSQL without TLS | Done | `config/settings.py`; tested |
+| HTTPS redirect and 1-year HSTS in production (no subdomains or preload yet) | Done | settings |
+| CSP with self-only scripts, `frame-ancestors 'none'`, Permissions-Policy, nosniff, Referrer-Policy | Done | `config/middleware.py` |
+| `no-store` on staff, account, contact and inquiry pages and on every non-GET response | Done | `config/middleware.py` |
+| Inquiry fields hidden from Django error reports | Done | `sensitive_post_parameters` |
+| Demo inquiry never stores or sends data | Done | `website/views.py`; tested |
+| Public queries return published records only | Done | `ProjectQuerySet.published()` |
+| Publish permission protects live content, including bulk delete | Done | `projects/admin.py`; tested |
+| Photo uploads: JPEG, PNG or WebP only, up to 10 MB and 24 MP, verified, re-encoded, metadata stripped, generated file name | Done | `ProjectImage`; tested |
+| Unapproved photos private | Done | `projects/views.py`; tested |
+| Pannellum `escapeHTML: true` | Done | `static/js/site.js` |
+| Secret scanning before each commit and over full history in CI | Done | `.githooks/`, CI |
+| Hash-locked dependencies, pip-audit, Bandit; pinned actions; read-only CI token | Done | CI |
+| Production logging and a 500 page | **Not done** (A07) | |
+| Proxy-aware client IP for lockout | **Not done** (A09) | |
+| Rate limits on future public endpoints (inquiry, chat) | Not built yet | |
+| Draft/review workflow and staff audit log | Not built yet | |
+| Backups, restore test, monitoring | Not built yet | |
 
-## Proposed staff permissions
+The CSP still allows `'unsafe-inline'` for styles. Our templates use no inline styles, so check whether the Django admin needs it before tightening. Django 5.2 has no built-in CSP; if we later need nonces or violation reports, consider django-csp.
 
-| Capability | System administrator | Manager | Content editor |
+## Staff roles (draft)
+
+| Capability | System admin | Manager | Content editor |
 | --- | --- | --- | --- |
 | Edit listing drafts and media | Yes | Yes | Yes |
-| Approve/publish listings and public contacts | Yes | Yes | No |
-| Read/manage inquiries | Only if separately authorized | Yes | No |
-| Export inquiry details | Disabled initially | Disabled initially | No |
-| Manage staff accounts/permissions | Yes | No | No |
-| View application secrets | Through restricted operational access | No | No |
+| Approve and publish listings and public contacts | Yes | Yes | No |
+| Read and manage inquiries | Only if separately authorised | Yes | No |
+| Export inquiries | Off at first | Off at first | No |
+| Manage staff accounts and permissions | Yes | No | No |
+| See application secrets | Through restricted operations access only | No | No |
 
-This matrix is proposed; actual responsibilities remain unknown. Django superusers can bypass many application permissions, so reserve them for restricted operational recovery and do not promise that an ordinary role check can hide leads from a superuser. Prefer non-superuser accounts for daily work. Use named accounts, not shared passwords. Verify every direct URL, admin action, list, search, preview, and download under each role.
+This is a proposal; the company hasn't confirmed roles (Q03). Django superusers bypass most permission checks, so keep superuser accounts for emergencies, and never promise that a role check hides leads from a superuser. Use named accounts, never shared passwords. Test every direct URL, admin action, list, search, preview and download under each role.
 
-## Required implementation controls
+## Rules by area
 
-### Authentication and sessions
+### Sign-in and sessions
 
-Use Django's authentication, password hashing, password validators, and session handling. Recommend a maintained MFA package such as [django-two-factor-auth](https://django-two-factor-auth.readthedocs.io/en/stable/), subject to compatibility and maintenance checks before installation. Require MFA for all staff and verify enrollment, admin routes, recovery, and any alternate login route. Avoid custom password or MFA algorithms.
+- Use Django's auth, hashing, validators and sessions. No custom password or MFA code.
+- Every staff member uses MFA. Test enrollment, admin routes, recovery and any other way in.
+- Protect recovery codes. Remove access when someone leaves, and record permission changes.
+- Test logout, password change, recovery and expired sessions.
+- Throttle at the hosting layer as well as in the app, and make sure no alternative login route skips throttling.
 
-Prefer Django's supported scrypt hasher after deployment resource testing. Store hashes only. Protect MFA recovery codes, revoke access when staff leave, and record permission changes. Define session lifetime and idle behavior after staff workflow review. Use server-side sessions and secure, HttpOnly session cookies with appropriate SameSite policy. Test logout, password change, recovery, and expired sessions.
+### Data, input and output
 
-Django does not include authentication throttling by default. Require rate limits at the trusted ingress and application layer; choose a compatible package only if the host cannot supply needed controls. Prevent a login or MFA bypass through an unthrottled alternate endpoint.
-
-### Authorization, SQL, input, and output
-
-Use ORM parameterization and validated Django forms. Review every raw query or dynamic ordering clause separately. Validate field lengths, supported formats, decimal ranges, object ownership, publishing state, and allowed choices on the server. Normalize Bangla/ASCII digits where needed for phone validation; format validation does not prove the visitor owns a number.
-
-Default-deny staff operations. Filter public queries to published, visible content, including chat context and media. Do not trust IDs or role flags from a browser or model.
-
-Keep template autoescaping on and quote attributes. Avoid mark_safe, unsafe template filters, raw HTML content fields, and innerHTML for chat/messages. Render model output as plain text or tightly controlled components. Validate link schemes and destinations; generated URLs must come from application-owned identifiers, not model instructions.
-
-Keep CSRF middleware active on staff and public state-changing forms, including chat and interest submission. Use appropriate request methods; GET must not modify records. SameSite cookies and CORS rules do not replace CSRF checks. Do not add wildcard CORS for a same-origin application.
+- Use the ORM and Django forms. Review any raw SQL or dynamic ordering separately.
+- Validate lengths, formats, decimal ranges, publication state and allowed choices on the server. Normalise Bangla digits in phone numbers; a valid format doesn't prove the visitor owns the number.
+- Deny staff actions by default. Filter every public query to published content, including chat context and media. Never trust IDs or role flags from the browser or the model.
+- Keep auto-escaping on and quote attributes. Avoid `mark_safe`, raw HTML fields and `innerHTML` for chat or messages. Render model output as plain text. Build links from our own IDs, never from model instructions.
+- Keep CSRF on every state-changing form, including chat and inquiry. GET must never change data. No wildcard CORS.
 
 ### Deployment and secrets
 
-Require HTTPS, explicit allowed hosts and trusted origins, production DEBUG off, and secret values outside source control. Trust forwarded HTTPS/IP headers only from configured proxies. Introduce HSTS carefully after verifying HTTPS and relevant subdomains. Add suitable CSP, clickjacking protection, content-type protections, referrer policy, and restrictive permissions policy.
-
-Django 5.2 does not have the newer built-in CSP middleware. Recommend [django-csp](https://django-csp.readthedocs.io/en/latest/) or equivalent ingress headers, with report-only testing before enforcement. Avoid unsafe script directives where possible. Do not weaken the policy merely to accommodate an unnecessary embed.
-
-Use least-privilege database and service accounts, a private database network, protected storage, and encrypted transport, disks, and backups. Keep staging/production separate. Never expose environment files, traceback pages, admin dumps, secret-bearing commands, or API keys in client JavaScript. Rotate compromised credentials and document recovery.
+- HTTPS, explicit allowed hosts and trusted origins, DEBUG off, secrets outside source control.
+- Trust forwarded HTTPS and IP headers only from our own proxy (`TRUST_PROXY_HTTPS=1` covers HTTPS only; see A09 for the IP).
+- Turn on HSTS for subdomains, and preload, only after checking every company subdomain serves HTTPS.
+- Least-privilege database and service accounts, a private database network, encrypted transport, disks and backups. Staging and production kept separate.
+- Never expose `.env` files, tracebacks, admin dumps or API keys. Rotate anything leaked and record how.
 
 ### Media
 
-Allow only needed image, panorama, and video formats. Enforce request/file/dimension limits, validate actual content, re-encode images, strip unnecessary metadata, use generated paths, and reject SVG/HTML/script-bearing uploads. Check decompression/resource limits. Approved logo exports are handled separately from ordinary staff uploads.
+- Allow only the image, panorama and video formats we need. Enforce file, request and dimension limits; check the real content; re-encode; strip metadata; generate file paths; reject SVG, HTML and anything script-bearing.
+- Serve public media with correct content types and no execution. Private files need authentication and private storage. Never fetch remote media from a URL a user gives us (SSRF).
 
-Serve normalized public media from configured static/object storage with correct content types and no execution. Private files require authenticated access and private storage; public PDF/land documents are outside the initial scope. Do not let the server fetch arbitrary remote media URLs, avoiding SSRF and unexpected disclosure.
+## AI safety
 
-Pannellum's API configuration defaults HTML escaping off. Explicitly set escapeHTML true, validate captions/hotspots, disallow arbitrary hotspot HTML and unsafe links, and test with malicious content. See its [configuration reference](https://pannellum.org/documentation/reference/#escapehtml-boolean). This is a design control for a proposed dependency, not a discovered application flaw.
+- The server supplies approved facts for the two listings and the FAQs. Prompts are not access control.
+- No private-data tools, web access, code execution or admin functions for the model. Lead creation stays separate from chat and needs a human to submit the form.
+- Price, area, availability and contact cards come from server data. Check any listing ID the model picks against the published records.
+- The assistant admits when it doesn't know, and refers ownership, approvals, returns, negotiation and contract questions to staff. It can't book anything, promise availability, guarantee returns or decide eligibility.
+- Keys stay on the server, in a restricted provider project. Limit message size, history and tokens, cap concurrent requests, and enforce global and per-session quotas plus a spending limit in the app. Don't rely on provider budget alerts alone. Timeouts, refusals, outages and exhausted quotas show a safe fallback in both languages.
+- Before free-text chat, tell the visitor an external AI service processes it and get their agreement. Screen obvious phone, email and ID patterns, including Bangla digits, and point people to the inquiry form instead. Screening isn't perfect, so the company must accept that residual risk. Don't claim chats are anonymous or that no data leaves Bangladesh.
+- Turn off response storage where supported; keep no transcripts. Provider abuse-monitoring retention can still apply (OpenAI's [data controls](https://developers.openai.com/api/docs/guides/your-data) describe this). Zero data retention needs separate approval, so confirm the real account settings before launch.
+- Before launch, run a synthetic bilingual test set: ordinary questions, mixed language, unknown facts, sold or unpublished plots, conflicting facts, prompt injection, malicious HTML and links, personal data, duplicate leads, outages and quota limits.
 
-## AI security and safety
+## Privacy and Bangladesh law
 
-The server supplies current approved facts for only the two listings and FAQs. Do not use model prompts as access control. Give the provider no private-data tools, web access, code execution, or administrative functions. Separate lead creation from chat and require a human-initiated form submission.
+Government sources list the **Personal Data Protection Act, 2026** (Act No. 63, gazetted 10 April 2026). Section 1(3) brings parts of it into force at different times. The company or its legal adviser must confirm which provisions apply now, any later rules, and what that means for this site. Sources: [gazette entry](https://www.dpp.gov.bd/bgpress/index.php/document/get_extraordinary/61156), [gazette text](https://www.dpp.gov.bd/upload_file/gazettes/61156_38449.pdf), [ICT Division laws](https://ictd.gov.bd/pages/laws). This is research, not a legal opinion.
 
-Show price, area, availability, and contact cards from server data. Validate any model-selected plot IDs against public records. The assistant must admit missing information and refer ownership, approvals, investment returns, negotiation, and contractual questions to staff. It cannot book, promise availability, guarantee returns, or make housing eligibility decisions.
+The audience is in Bangladesh, but the host, AI provider or other services may process data abroad. Map every processor, storage location, contract and transfer. GDPR isn't our baseline just because the site can be opened from overseas.
 
-Keep keys server-side, use restricted provider projects, bound message sizes/history/tokens, cap concurrent requests, and enforce global/per-session quotas and application-side spend limits. Do not rely only on provider budget alerts. Timeouts, provider refusal, outages, and quota exhaustion must produce a safe bilingual fallback.
+We couldn't find a published company privacy policy (that doesn't prove there isn't one). Get the approved policy, or write an accurate bilingual one that describes what the site really does.
 
-Before sending free text, disclose external AI processing and ask for affirmative agreement. Screen obvious phone/email/identity patterns, including Bangla numerals, and direct personal details to the separate form. Screening cannot guarantee removal of every personal detail; the company must approve the residual risk and processor arrangements. Do not claim all conversations are anonymous or that no data leaves Bangladesh.
+### Retention proposal
 
-Set supported response storage off, avoid durable conversation objects/background jobs, and do not store application transcripts by default. [OpenAI data controls](https://developers.openai.com/api/docs/guides/your-data) distinguish application storage from standard abuse-monitoring retention, commonly up to 30 days with exceptions. Zero Data Retention requires eligibility/approval; it is not assumed. Confirm actual provider account behavior before launch.
+Starting points for discussion, not approved policy.
 
-Run a synthetic bilingual evaluation set containing ordinary questions, mixed-language input, unknown facts, sold/unpublished plots, conflicting facts, prompt injection, malicious HTML/links, personal identifiers, duplicate lead attempts, outage, and quota cases. Require no access-boundary violation in the tested set, staff review of factual answers, and documented limitations. Follow [official AI safety guidance](https://developers.openai.com/api/docs/guides/safety-best-practices).
-
-## Privacy and Bangladesh requirements
-
-Government sources list the Personal Data Protection Act, 2026, Act No. 63, gazetted on 10 April 2026. Section 1(3) has staggered commencement provisions. The company/legal adviser must verify currently applicable provisions, later notifications/rules, and obligations for its exact processing before launch. Do not rely solely on the earlier 2025 ordinance.
-
-Sources: [official gazette entry](https://www.dpp.gov.bd/bgpress/index.php/document/get_extraordinary/61156), [gazette text](https://www.dpp.gov.bd/upload_file/gazettes/61156_38449.pdf), and [ICT Division current laws](https://ictd.gov.bd/pages/laws), which also lists cyber protection legislation and amendments. This planning review identifies the relevant current law; it does not establish complete legal compliance, mandatory localization, or a breach-notification deadline.
-
-Domestic targeting does not prevent overseas processing by a host, AI service, analytics vendor, or communication provider. Map those processors, storage locations, access, contracts, and transfers. GDPR is not an assumed baseline merely because the website can be opened overseas; reassess if operations/targeting change.
-
-A published company privacy policy could not be verified from the pages inspected. Attempts to fetch likely privacy-policy URLs did not establish absence. Obtain the approved policy or write an accurate bilingual policy describing this site's actual behavior.
-
-### Data minimization and retention proposal
-
-| Data | Purpose | Proposed handling, pending company approval |
+| Data | Purpose | Proposed handling |
 | --- | --- | --- |
-| Name, callback phone, selected plot, short message | Respond to requested sales inquiry | Restricted inbox; proposed deletion after 90 days unless a documented need/lawful exception applies |
-| Consent timestamp and notice version | Evidence of inquiry permission | Keep with inquiry; separate marketing permission if marketing is later introduced |
-| Chat text | Answer plot questions | Volatile browser history and bounded server processing; no durable application transcript |
-| Anonymous session/abuse counters | CSRF and abuse/spend control | Short-lived technical state; no advertising ID; establish expiry and cleanup |
-| Security/server logs | Diagnose abuse and failures | Minimize/redact identifiers; proposed 30-day retention; restrict access |
-| Staff audit events | Accountability | IDs/actions/timestamps, no copied lead contents; retention to be approved |
-| Backups | Recovery | Encrypted, access-restricted; proposed 30-day rotation with documented deletion/recovery handling |
+| Name, phone, chosen plot, short message | Reply to the inquiry | Restricted inbox; delete after 90 days unless there's a documented reason |
+| Consent time and notice version | Proof of permission | Kept with the inquiry; separate permission if marketing is ever added |
+| Chat text | Answer questions | Browser memory and limited server processing; no stored transcript |
+| Anonymous session and abuse counters | CSRF, abuse and cost control | Short-lived; no advertising IDs |
+| Security and server logs | Investigate abuse and failures | Minimise and redact; 30 days; restricted access |
+| Staff audit events | Accountability | IDs, actions and times, never lead contents; retention to be agreed |
+| Backups | Recovery | Encrypted and restricted; 30-day rotation; deleted data must not come back after a restore |
 
-Retention proposals are engineering defaults for discussion, not approved policy. Access logs can contain IP addresses even without analytics; minimize them and include actual practices in the privacy inventory. Redact lead/chat fields from logs, error monitoring, and CI artifacts. No customer information in URLs, browser localStorage, exports, notifications, or public admin previews.
+Access logs can contain IP addresses even without analytics; include that in the privacy notice. Keep lead and chat fields out of logs, error reports and CI artifacts. No customer data in URLs, localStorage, exports, notifications or admin previews. Permission must be specific to the inquiry, never preticked, and never imply marketing. Provide a privacy contact, a deletion and correction process, and scheduled cleanup.
 
-Use clear purpose-specific permission before lead submission. Make no marketing subscription automatic. Provide a company-controlled privacy contact, deletion/correction process, and retention cleanup. Restoration from a backup must not silently reactivate previously deleted customer data; document deletion records and post-restore cleanup.
+## Tools
 
-## Automated workflow and recommended tools
-
-| Tool / integration | Use | Timing and privacy notes |
+| Tool | Use | Notes |
 | --- | --- | --- |
-| Ruff and Django checks | Code quality and configuration | Local/CI; not a security guarantee |
-| [Bandit](https://bandit.readthedocs.io/en/latest/) | Python static security checks | Each relevant change; review severity and confidence |
-| [pip-audit](https://github.com/pypa/pip-audit) | Known dependency vulnerabilities | Dependency changes, CI, recurring checks; advisory queries disclose package/version metadata |
-| [Gitleaks](https://github.com/gitleaks/gitleaks) | Secrets in changes/history | Before commits and in CI; redact findings and restrict artifacts |
-| [Dependabot](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependabot-alerts) | Dependency alerts and update workflow | After a company-owned private GitHub repository exists; confirm settings/feature access |
-| [OWASP ZAP baseline](https://www.zaproxy.org/docs/docker/baseline-scan/) | Passive web checks during a limited crawl | Owned staging only, synthetic data; review traffic and report exposure |
-| Semgrep, optional | Targeted Django/JS rules if more coverage is needed | Local mode, reviewed rules, metrics off; do not authenticate/upload findings without approval of data handling |
-| axe-core and Lighthouse | Accessibility/performance evidence | Alongside manual tests; automated coverage is incomplete |
-| Codex Security, optional | Contextual vulnerability investigation/review | Available but not installed/connected as of this review; assess permissions and source-code handling before use |
+| Ruff, Django checks | Code quality and configuration | Every change; not a security guarantee |
+| [Bandit](https://bandit.readthedocs.io/en/latest/) | Python security lint | Every change |
+| [pip-audit](https://github.com/pypa/pip-audit) | Known dependency vulnerabilities | Every change and weekly in CI; sends package names and versions to the advisory service |
+| [Gitleaks](https://github.com/gitleaks/gitleaks) | Secrets in commits and history | Pre-commit hook and CI, with redacted output |
+| [Dependabot](https://docs.github.com/en/code-security/concepts/supply-chain-security/dependabot-alerts) | Update proposals | Configured for GitHub Actions, weekly |
+| [OWASP ZAP baseline](https://www.zaproxy.org/docs/docker/baseline-scan/) | Passive web scan | Our own staging only, with synthetic data |
+| Semgrep (optional) | Extra Django/JS rules | Local mode, metrics off |
+| axe-core, Lighthouse | Accessibility and performance evidence | Alongside manual testing |
 
-Use a company-owned private repository with least-privilege CI, protected production secrets, restricted artifacts, and pinned trusted actions. Untrusted pull-request code must not run with production credentials. Require tests and security checks before merging; perform deploy checks against production-like settings before release. Block confirmed critical/high issues; triage lower findings and false positives with evidence, owner, expiry, and rationale.
+Keep CI least-privilege with pinned actions, and never run untrusted pull-request code with production secrets. Block confirmed critical or high findings. Triage lower ones with evidence, an owner and a reason.
 
-Recommended Codex skills: use OpenAI Docs for AI API/data-control changes; use skill-creator later to package a narrow project security-review workflow based on this file; use skill-installer only for a vetted skill after reviewing its source and permissions. No dedicated security auditing skill has been verified as installed here. Skills guide reviews; scanners, tests, and human judgment provide evidence. [Codex Security guidance](https://developers.openai.com/blog/scaling-cyber-defenders-with-daybreak) describes the optional integration. No plugin, package, or custom skill was installed in this planning phase.
+## Planning risks
 
-## Planning risks requiring resolution
-
-| ID | Potential severity | Risk and required action |
+| ID | Severity | Risk and action |
 | --- | --- | --- |
-| S01 | High | Undefined staff permissions could expose leads or allow unauthorized publishing; agree the matrix and test direct access |
-| S02 | High | Free-text AI can receive unintended personal details and use overseas processing; approve disclosure, filtering, provider terms, and transfer assessment |
-| S03 | High | Untrusted chat/media text could become stored or DOM XSS; use safe rendering, Pannellum escaping, validation, and CSP |
-| S04 | High | Incorrect AI prices, status, or ownership claims can mislead buyers; use authoritative cards, constrained context, evaluations, and human handoff |
-| S05 | Medium | Anonymous AI/lead endpoints can cause spam or cost/availability abuse; apply atomic quotas, ingress limits, and safe fallback |
-| S06 | High | Unreviewed land-document publication could disclose personal/legal information; keep it outside MVP and require review before any expansion |
-| S07 | Medium | Hosting, restoration, and patch ownership are unknown; select accountable staff and verify operations before release |
-
-These are potential-impact planning risks. Actual development-source findings and their fixes are recorded separately in SECURITY_AUDIT.md. For each actual finding later, record affected file/version, evidence, severity, exploit conditions, privacy impact, recommended fix, owner, and retest result. Do not repeat secrets or real customer data in reports.
+| S01 | High | Undefined staff permissions could expose leads or allow unauthorised publishing. Agree the role matrix and test direct access |
+| S02 | High | Free-text AI may receive personal details and be processed overseas. Approve the disclosure, filtering, provider terms and transfer assessment |
+| S03 | High | Chat or media text could become stored or DOM XSS. Use safe rendering, Pannellum escaping, validation and CSP |
+| S04 | High | Wrong AI prices, status or ownership claims could mislead buyers. Use data-driven cards, limited context, evaluations and handoff to staff |
+| S05 | Medium | Anonymous AI and lead endpoints invite spam and cost abuse. Use quotas, hosting-level limits and safe fallbacks |
+| S06 | High | Publishing land documents unreviewed could leak personal or legal information. Keep it out of the MVP |
+| S07 | Medium | Hosting, restore and patching owners are unknown. Name accountable staff and test operations before release |
 
 ## Release checklist
 
-- [ ] Confirm roles, contacts, privacy owner, budgets, hosting, provider processing, and approved retention.
-- [ ] Verify staff MFA, throttling, sessions, recovery, revocation, and direct-route authorization.
-- [ ] Verify CSRF, validation, ORM use, safe output, published-only data, and upload limits.
-- [ ] Verify CSP and HTTPS headers, allowed hosts, proxy trust, cookie behavior, and DEBUG off.
-- [ ] Confirm secrets scan, dependency audit, static checks, and security-sensitive tests pass.
-- [ ] Review bilingual AI evaluations, spend limits, data filtering, provider failure, and fallback.
-- [ ] Verify privacy notice, consent, deletion, access/log restrictions, and absence of lead fields from AI payloads.
-- [ ] Complete staging ZAP baseline, accessibility tests, and realistic mobile performance checks.
-- [ ] Restore an encrypted backup, verify deletion cleanup, and demonstrate rollback.
-- [ ] Record residual findings, company decisions, test evidence, and maintenance responsibilities.
+- [ ] Roles, contacts, privacy owner, budgets, hosting, AI provider and retention confirmed by the company.
+- [ ] Staff MFA, throttling, sessions, recovery, revocation and direct-URL authorisation tested.
+- [ ] CSRF, validation, ORM use, safe output, published-only data and upload limits tested.
+- [ ] CSP, HTTPS headers, allowed hosts, proxy trust, cookies and DEBUG off checked on the real host.
+- [ ] Secret scan, dependency audit, static checks and security tests passing.
+- [ ] Bilingual AI evaluations, spending limits, data filtering, provider failure and fallback reviewed.
+- [ ] Privacy notice, consent, deletion, log restrictions, and no lead fields in AI requests checked.
+- [ ] Staging ZAP scan, accessibility tests and real mobile performance checks done.
+- [ ] Encrypted backup restored, deletion cleanup verified, rollback demonstrated.
+- [ ] Remaining findings, company decisions, test evidence and maintenance owners recorded.
