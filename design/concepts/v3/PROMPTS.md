@@ -1,8 +1,8 @@
 # V3 Selected Homepage Edit
 
-Date: 23 October 2026, Asia/Dhaka. Tool: built-in image_gen, edit mode; no CLI workflow.
+Historical record from 23 October 2026. Made with an AI image generator in edit mode. The prompt below is kept word-for-word.
 
-The user selected A / Open Horizon as final for now and requested Project 01 / Project 02 naming. Input: [original candidate A](archive/homepage-options/a-open-horizon.png). Output: [selected homepage](01-home.png). The candidate and earlier versions are preserved.
+Arif chose A / Open Horizon as final for now and asked for Project 01 / Project 02 naming. Input: [original candidate A](archive/homepage-options/a-open-horizon.png) (local only, git-ignored). Output: [selected homepage](01-home.png).
 
 ```text
 Use case: text-localization / ui-mockup text edit.

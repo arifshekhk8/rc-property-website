@@ -1,6 +1,8 @@
-# Temporary application media
+# Sample media prompts
 
-23 October 2026. Built-in image_gen. Generated samples are not real property evidence. Real media will be supplied later. The sample video is a short animated still, not a recorded site walkthrough.
+Historical record from 23 October 2026. The hero image and panorama were made with an AI image generator; the prompts below are kept word-for-word. They are invented samples, not photos of the real plots. The sample videos are 8-second animations of still images, not site walkthroughs. Real media from the company will replace all of these.
+
+This file sits in `app/static/`, so `collectstatic` would publish it. Move it out before deploying (A14 in SECURITY_AUDIT.md).
 
 ## sample-hero
 
