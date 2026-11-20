@@ -28,7 +28,7 @@ V1 and V2 are kept locally (git-ignored). Every land image in every version is a
 
 ## Logo
 
-The supplied logo (`RCPDL.png`, 7284 × 1526 px, transparent background) combines an RC monogram with a roof-and-window shape, blue lettering and several greens. The `.ai` file is PDF-compatible and sits on an A4 artboard. Web versions are optimised copies; never edit the originals.
+The supplied logo (`docs/supplied/RCPDL.png`, 7284 × 1526 px, transparent background) combines an RC monogram with a roof-and-window shape, blue lettering and several greens. The `.ai` file is PDF-compatible and sits on an A4 artboard. Web versions are optimised copies; never edit the originals.
 
 Colours sampled from the PNG (not an official brand spec):
 

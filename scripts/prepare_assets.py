@@ -14,6 +14,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 STATIC = ROOT / "app/static"
+SUPPLIED = ROOT / "docs/supplied"
 
 
 def export(source, destination, width, quality=85):
@@ -81,8 +82,8 @@ def main():
             images / f"{key}.webp",
             1280,
         )
-    export(ROOT / "RCPDL.png", images / "logo.webp", 600, 95)
-    with Image.open(ROOT / "RCPDL.png") as logo:
+    export(SUPPLIED / "RCPDL.png", images / "logo.webp", 600, 95)
+    with Image.open(SUPPLIED / "RCPDL.png") as logo:
         logo.thumbnail((96, 96))
         logo.save(images / "favicon.png")
     manifests = [

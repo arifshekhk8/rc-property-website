@@ -47,7 +47,7 @@ Open http://127.0.0.1:8000/en/ or http://127.0.0.1:8000/bn/. Staff setup and the
 - **A recommendation is not a decision** until Arif or the company confirms it.
 - **Commits:** only when Arif asks. Small, focused commits with an imperative subject line and no AI attribution lines. `main` is protected: changes go in through a pull request, and the `django` and `secrets` checks must pass.
 - **No secrets or personal data** in the repo or these docs: no credentials, customer leads, chat transcripts, database exports or private land documents.
-- **Keep the supplied originals unchanged:** `RCPDL.png`, `RCPDL Logo.ai` and the feature DOCX. Their hashes are in PROGRESS.md.
+- **Keep the supplied originals unchanged:** the logo PNG and `.ai` file and the feature DOCX in `docs/supplied/`. Their hashes are in `docs/PROGRESS.md`.
 
 ## Workspace layout
 
@@ -55,13 +55,12 @@ Open http://127.0.0.1:8000/en/ or http://127.0.0.1:8000/bn/. Staff setup and the
 Intern_/
   app/                      Django project: config, projects, website, templates, static, tests
   docs/                     planning, decisions, design direction, security, progress
+  docs/supplied/            company-supplied originals: logo PNG (tracked), logo .ai and feature DOCX (local only)
   scripts/                  dev runner, production-settings check, Gitleaks installer, asset export
   design/concepts/v3/       14 selected design boards and notes (tracked)
   design/concepts/v1, v2    earlier design packs (local only, git-ignored)
   .github/                  CI workflow and Dependabot config
   requirements*.in / .lock  dependencies; the locks are hashed (uv pip compile)
-  RCPDL.png                 supplied logo (tracked)
-  RCPDL Logo.ai, *.docx     supplied originals (local only, git-ignored)
 ```
 
 ## Company sources

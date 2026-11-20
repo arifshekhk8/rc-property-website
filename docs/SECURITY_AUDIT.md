@@ -34,7 +34,8 @@ Changes made in this pass were not security-related: templates re-indented with 
 | A11 | Low | `CSRF_TRUSTED_ORIGINS` entries aren't trimmed, so `a.com, b.com` silently breaks the second origin | `app/config/settings.py:38` | `strip()` each entry, as `ALLOWED_HOSTS` does |
 | A12 | Low | Replacing or deleting a `ProjectImage` leaves the old file on disk | `app/projects/models.py` | Delete the old file on replace and delete |
 | A13 | Nit (accessibility) | The video caption track is labelled "en"/"bn" | `app/templates/website/visit.html` | Use "English" and "বাংলা" |
-| A14 | Nit | `GENERATION_PROMPTS.md` is in `app/static/images/`, so `collectstatic` would publish it | `app/static/images/` | Move it outside `static/` |
+
+**Fixed since the review:** A14. `GENERATION_PROMPTS.md` was in `app/static/images/`, where `collectstatic` would have published it. It now lives at [docs/SAMPLE_MEDIA_PROMPTS.md](SAMPLE_MEDIA_PROMPTS.md).
 
 ## Plan coverage
 

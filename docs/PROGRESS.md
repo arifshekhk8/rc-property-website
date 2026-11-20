@@ -40,6 +40,7 @@ The foundation build is complete and checked. It is a working local preview, not
 - Gave the 404 page its own text in both languages ("Page not found"), with buttons to the home page and to projects. It used to say "Project information is being updated." Added a test for it.
 - Rewrote every doc as short internal working notes. Removed stale status lines and references to tooling the project never used, and deleted `design/concepts/v3/NEXT_STEPS.md` (its checklist is now in REQUIREMENTS.md).
 - Logged the review's open findings as A07–A14 in SECURITY_AUDIT.md.
+- Organised the folder: planning docs moved into `docs/`, the supplied originals into `docs/supplied/`, and the sample-media prompts out of the public static folder (fixes A14).
 
 ## Latest checks (21 November 2026, local)
 
@@ -66,14 +67,13 @@ From the 21 November review. Details, file references and suggested fixes are in
 5. `CSRF_TRUSTED_ORIGINS` doesn't strip spaces (A11).
 6. Replaced or deleted photos stay on disk (A12).
 7. The caption track is labelled "en"/"bn" instead of a language name (A13).
-8. `GENERATION_PROMPTS.md` sits in `app/static/`, so it would be published (A14).
 
 ## Next steps
 
 If work resumes in this repo (otherwise these carry over to `rcpdl-website`):
 
 1. Commit the 21 November changes through a pull request so CI runs on them.
-2. Fix A07–A09 before any deployment; A10–A14 when convenient.
+2. Fix A07–A09 before any deployment; A10–A13 when convenient.
 3. Staff draft/review/publish workflow, editable public contacts, real video and panorama upload.
 4. Private inquiry inbox with a consent record, recipient permissions, abuse limits and retention. Use synthetic data until the company answers Q03–Q05.
 5. The AI adapter, only after the inquiry boundary exists and the company settles Q06.
@@ -81,7 +81,7 @@ If work resumes in this repo (otherwise these carry over to `rcpdl-website`):
 
 ## Supplied file hashes
 
-Recorded on 15 October 2026 before any work; rechecked 21 November 2026.
+Recorded on 15 October 2026 before any work; rechecked on 21 November 2026 after moving the files to `docs/supplied/`.
 
 | File | SHA-256 |
 | --- | --- |

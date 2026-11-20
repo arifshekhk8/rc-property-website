@@ -33,7 +33,7 @@ Accepted decisions, oldest first. "Arif" means Arif made the decision or passed 
 | D23 | 23 Oct | Arif: "Okay lets start." Build from V3 with sample photos, video and 360° imagery |
 | D24 | 23 Oct | Audit the build against the plan and security rules, fix the gaps, and push to a new private repo in focused commits |
 | D25 | 7 Nov | Continue development in a new private repo, `rcpdl-website`. This repo keeps the foundation and changes only when Arif asks |
-| D26 | 21 Nov | Arif asked for a code review, then the template cleanup, the 404 fix and a docs rewrite in this repo. The docs are internal working notes |
+| D26 | 21 Nov | Arif asked for a code review, then the template cleanup, the 404 fix, a docs rewrite and a tidier folder layout in this repo. The docs are internal working notes |
 
 ## Engineering choices (made during the build, 23 October)
 

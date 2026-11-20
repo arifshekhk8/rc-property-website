@@ -83,9 +83,9 @@ Every listing fact and image is a sample, and labelled as one. Keep the sample l
 
 | Asset | Source |
 | --- | --- |
-| Logo (`logo.webp`, `favicon.png`) | Exported from the supplied `RCPDL.png` |
+| Logo (`logo.webp`, `favicon.png`) | Exported from the supplied `docs/supplied/RCPDL.png` |
 | Project photos (`project-01.webp`, `project-02.webp`) | AI-generated illustrations from the V2 design work |
-| Hero and panorama | AI-generated; prompts in [GENERATION_PROMPTS.md](static/images/GENERATION_PROMPTS.md) |
+| Hero and panorama | AI-generated; prompts in [SAMPLE_MEDIA_PROMPTS.md](../docs/SAMPLE_MEDIA_PROMPTS.md) |
 | Sample videos | 8-second FFmpeg animations of each project's still image, with English and Bangla captions |
 | Noto fonts, Pannellum 2.5.7 | Self-hosted with licences; sources and checksums in [MANIFEST.json](static/vendor/MANIFEST.json) |
 
