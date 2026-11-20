@@ -54,7 +54,7 @@ The foundation build is complete and checked. It is a working local preview, not
 | pip-audit (runtime lock) | No known vulnerabilities |
 | Supplied file hashes | All three match the 15 October values |
 
-These changes are not committed or pushed yet, so CI hasn't run on them. The last CI evidence is from 23 October: the [PostgreSQL run with 34 tests](https://github.com/arifshekhk8/rc-property-website/actions/runs/39985417363) on [PR #3](https://github.com/arifshekhk8/rc-property-website/pull/3).
+CI also passed on PostgreSQL 17 for these changes: [PR #5](https://github.com/arifshekhk8/rc-property-website/pull/5), [run](https://github.com/arifshekhk8/rc-property-website/actions/runs/44806183830). Earlier evidence: the [34-test PostgreSQL run](https://github.com/arifshekhk8/rc-property-website/actions/runs/39985417363) on [PR #3](https://github.com/arifshekhk8/rc-property-website/pull/3).
 
 ## Open items
 
@@ -72,7 +72,7 @@ From the 21 November review. Details, file references and suggested fixes are in
 
 If work resumes in this repo (otherwise these carry over to `rcpdl-website`):
 
-1. Commit the 21 November changes through a pull request so CI runs on them.
+1. Review and merge [PR #5](https://github.com/arifshekhk8/rc-property-website/pull/5).
 2. Fix A07–A09 before any deployment; A10–A13 when convenient.
 3. Staff draft/review/publish workflow, editable public contacts, real video and panorama upload.
 4. Private inquiry inbox with a consent record, recipient permissions, abuse limits and retention. Use synthetic data until the company answers Q03–Q05.
