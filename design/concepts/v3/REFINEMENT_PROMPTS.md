@@ -1,5 +1,7 @@
 # V3 Refinement Prompts
 
+Historical record from 23 October 2026. The prompts below are kept word-for-word. The `-refined` file names were renamed during the 23 October cleanup; `archive/RELOCATIONS.json` (local only) maps old names to new ones.
+
 ## 08-about-contact-refined
 
 Input: 08-about-contact.png. Selected output: 08-about-contact-refined.png.
@@ -17,7 +19,7 @@ Use case: text-localization. Edit this V3 Privacy & Terms review board only to c
 ```
 
 
-Date: 23 October 2026, Asia/Dhaka. Built-in image_gen edit mode. Earlier drafts preserved.
+23 October 2026. AI image-generator edit; earlier drafts are in the local archive.
 
 ## Project 02 aerial identity correction
 

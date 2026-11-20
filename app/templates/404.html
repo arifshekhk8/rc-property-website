@@ -1,1 +1,15 @@
-{% extends 'base.html' %}{% block content %}<section class="wrap page-intro"><span class="eyebrow">404</span><h1>{{ copy.no_projects }}</h1><p>{{ copy.no_projects_sub }}</p><a class="button button-blue" href="{% url 'projects' %}">{{ copy.back_projects }} →</a></section>{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}{{ copy.not_found_title }} · RC Property{% endblock %}
+
+{% block content %}
+<section class="wrap page-intro">
+  <span class="eyebrow">404</span>
+  <h1>{{ copy.not_found_title }}</h1>
+  <p>{{ copy.not_found_body }}</p>
+  <div class="button-row">
+    <a class="button button-blue" href="{% url 'home' %}">{{ copy.not_found_home }} <span aria-hidden="true">→</span></a>
+    <a class="button button-outline" href="{% url 'projects' %}">{{ copy.explore }}</a>
+  </div>
+</section>
+{% endblock %}

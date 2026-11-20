@@ -1,6 +1,6 @@
 # V3 Full Design Pack — Generation Prompts
 
-Date: 23 October 2026, Asia/Dhaka. Built-in image_gen, one call per board, no CLI/API-key workflow.
+Historical record from 23 October 2026. One AI image-generation call per board. The prompts below are kept word-for-word; output file names are the ones used at generation time.
 
 Reference 1: approved [Open Horizon homepage](01-home.png), unchanged. Reference 2: supplied official logo. All property facts/media are design samples. Public naming: Project 01 / Project 02.
 

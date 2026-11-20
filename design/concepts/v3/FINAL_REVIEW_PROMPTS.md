@@ -1,6 +1,6 @@
 # V3 Final Visual Review Corrections
 
-Date: 23 October 2026, Asia/Dhaka. Built-in image_gen edits; original drafts retained.
+Historical record from 23 October 2026. AI image-generator edits; the original drafts are in the local archive. The prompts below are kept word-for-word, and the `-refined` file names were renamed during the cleanup (see `archive/RELOCATIONS.json`, local only).
 
 ## 10-staff-content-refined
 
