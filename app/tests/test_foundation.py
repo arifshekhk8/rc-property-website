@@ -14,6 +14,7 @@ from django_otp import DEVICE_ID_SESSION_KEY
 from django_otp.plugins.otp_totp.models import TOTPDevice
 from PIL import Image, PngImagePlugin
 from projects.models import FAQ, Project, ProjectImage
+from website.copy import BN, EN
 from website.forms import InquiryForm
 
 
@@ -56,6 +57,14 @@ class PublicBoundaryTests(TestCase):
                     self.assertEqual(response.status_code, 200)
                     self.assertNotContains(response, self.draft.title_en)
                     self.assertContains(response, f'lang="{language}"')
+
+    def test_unknown_pages_say_the_page_was_not_found_in_both_languages(self):
+        for language, copy in [("en", EN), ("bn", BN)]:
+            with self.subTest(language=language):
+                response = self.client.get(f"/{language}/no-such-page/")
+                self.assertContains(response, copy["not_found_title"], status_code=404)
+                self.assertContains(response, f'lang="{language}"', status_code=404)
+                self.assertNotContains(response, copy["no_projects"], status_code=404)
 
     def test_bangla_content_and_exact_sample_facts(self):
         response = self.client.get("/bn/projects/project-01/")
