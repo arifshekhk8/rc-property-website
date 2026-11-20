@@ -1,10 +1,10 @@
 # V3 design and interaction notes
 
-Last updated 21 November 2026. This is the interaction spec behind the [V3 boards](README.md). It goes with [REQUIREMENTS.md](../../../REQUIREMENTS.md) and [SECURITY.md](../../../SECURITY.md). Items marked **(built)** exist in the app; everything else is still to do.
+Last updated 21 November 2026. This is the interaction spec behind the [V3 boards](README.md). It goes with [REQUIREMENTS.md](../../../docs/REQUIREMENTS.md) and [SECURITY.md](../../../docs/SECURITY.md). Items marked **(built)** exist in the app; everything else is still to do.
 
 ## Visual system and naming
 
-- Keep the selected homepage look: white surfaces, navy headings, blue buttons, green availability labels, large land images and short copy. Colours come from the tokens in [DESIGN.md](../../../DESIGN.md#interface-palette), not from the generated pixels. **(built)**
+- Keep the selected homepage look: white surfaces, navy headings, blue buttons, green availability labels, large land images and short copy. Colours come from the tokens in [DESIGN.md](../../../docs/DESIGN.md#interface-palette), not from the generated pixels. **(built)**
 - Use the official logo export, not the AI-drawn versions in the boards. **(built)**
 - Names: Project 01 and Project 02 in English; প্রকল্প 01 and প্রকল্প 02 in Bangla. Use them in navigation, headings, cards, the inquiry form and staff screens. Display names only; no parent-project/child-plot system. **(built)**
 - Marketing pages lead with images and short headings, but always show price, both area units, location, availability and the next action. Forms, policies and staff screens use the same type and colours without decorative photos. **(built)**

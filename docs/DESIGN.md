@@ -4,7 +4,7 @@ Last updated 21 November 2026.
 
 ## Status
 
-The V3 **Open Horizon** design is built into this repo with custom CSS (`app/static/css/site.css`) and AI-generated sample media. The 14 design boards are in [design/concepts/v3/](design/concepts/v3/README.md), and the interaction rules are in [DESIGN_NOTES.md](design/concepts/v3/DESIGN_NOTES.md). The later "Grounded Premium" redesign was built in `rcpdl-website`, not here.
+The V3 **Open Horizon** design is built into this repo with custom CSS (`app/static/css/site.css`) and AI-generated sample media. The 14 design boards are in [design/concepts/v3/](../design/concepts/v3/README.md), and the interaction rules are in [DESIGN_NOTES.md](../design/concepts/v3/DESIGN_NOTES.md). The later "Grounded Premium" redesign was built in `rcpdl-website`, not here.
 
 ## Direction
 
