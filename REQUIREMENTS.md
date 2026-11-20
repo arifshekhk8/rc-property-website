@@ -1,123 +1,138 @@
-# Website Requirements and MVP Scope
+# Requirements
 
-Last updated: 23 October 2026, Asia/Dhaka.
+Last updated 21 November 2026.
 
-“Confirmed” means directly answered by the user. “Recommended” means proposed by this planning review. “Pending” means an answer or company decision is still needed. The user authorized implementation on 23 October after the V3 cleanup; the earlier design-only restriction is superseded by R23.
+**Confirmed** means Arif answered it directly, or passed it on from the manager or company. **Recommended** means it's our proposal. **Open** means it still needs an answer.
 
-## Confirmed requirements
+## Confirmed
 
 | ID | Requirement |
 | --- | --- |
-| R01 | Work for a Real Capita Group plot development business based in Gulshan-1, Dhaka, Bangladesh |
-| R02 | The business develops its own properties and brokers other owners' properties |
-| R03 | Launch with two land listings, publicly named Project 01 and Project 02 per the user's 23 October naming change; no project/subplot hierarchy is established |
-| R04 | Serve local homebuyers aged 35–60; local investors may also visit; overseas targeting is outside scope |
-| R05 | Provide both Bangla and English; most visitors will use phones |
-| R06 | Let visitors browse available plots, location, actual photographs, and complete relevant details |
-| R07 | Display prices publicly in BDT and land area in katha and square feet |
-| R08 | Include photographs, a walkthrough video, and a 360° panorama; the administrator will supply them |
-| R09 | Provide a staff administration area to maintain listings and media |
-| R10 | Include an AI assistant with free-text Bangla and English conversations |
-| R11 | When interested, visitors can obtain an approved manager/admin contact and send their details to authorized staff |
-| R12 | With permission, collect only name, phone, interested plot, and an optional short message |
-| R13 | No customer accounts, customer login, appointment scheduling, online reservation, or payments |
-| R14 | Prioritize UI/UX, accessibility, security, privacy, simplicity, and maintainability |
-| R15 | Deliver in approximately one to one-and-a-half months; a teammate will maintain the site |
-| R16 | Establish the development workflow; a private GitHub remote and protected main now exist under the user account, with company ownership/maintainers pending |
-| R17 | Original design-only instruction: create planning documentation first and preserve supplied files. Implementation hold superseded by R23; preservation remains required |
-| R18 | Use the manager's V1 feedback to reduce homepage text and create a more modern, image-led visual direction; show multiple homepage candidates before developing the approved direction into full V3 |
-| R19 | Add homepage Gallery and Virtual Site Visit sections as included in the selected Open Horizon design; Virtual Site Visit uses the existing video/panorama requirements and comes from feature 8 of the original document |
-| R20 | A / Open Horizon is the selected homepage direction, final for now. Use Projects, Project 01 and Project 02 consistently in current/future public UI; all V3 screens follow this direction |
-| R21 | Produce a complete V3 design folder comparable to V1/V2, covering all agreed public pages, gallery/media views, AI/inquiry and staff workflows with mobile/Bangla examples; a homepage-only deliverable is insufficient |
+| R01 | A website for a Real Capita Group plot development business in Gulshan-1, Dhaka |
+| R02 | The business develops its own land and brokers land for other owners |
+| R03 | Launch with two listings, named Project 01 and Project 02 (D20); no hierarchy |
+| R04 | Audience: local homebuyers aged 35–60, plus local investors. Overseas buyers are out of scope |
+| R05 | Bangla and English; most visitors use phones |
+| R06 | Visitors can browse available plots, location, real photos and full details |
+| R07 | Public prices in BDT; area in katha and square feet |
+| R08 | Photos, a walkthrough video and a 360° panorama, supplied by the admin |
+| R09 | A staff admin area for listings and media |
+| R10 | An AI assistant with free-text chat in Bangla and English |
+| R11 | Interested visitors get an approved staff contact and can send their details to authorised staff |
+| R12 | With permission, collect only name, phone, chosen plot and an optional short message |
+| R13 | No customer accounts, login, appointments, reservations or payments |
+| R14 | Priorities: UI/UX, accessibility, security, privacy, simplicity, maintainability |
+| R15 | About 1–1.5 months of work; a teammate maintains the site afterwards |
+| R16 | A private GitHub repo with a protected `main`. It's under Arif's account for now; company ownership is pending |
+| R17 | Keep the supplied files unchanged |
+| R18 | Follow the manager's V1 feedback: less text, more modern and image-led; show homepage options first |
+| R19 | The homepage has Gallery and Virtual Site Visit sections |
+| R20 | Open Horizon is the design direction; use "Projects", "Project 01" and "Project 02" everywhere |
+| R21 | V3 is a complete design pack covering public pages, media, AI/inquiry and staff flows |
+| R22 | Keep only the 14 selected V3 boards in the main folder (done) |
+| R23 | Build from V3 now, with sample media until real media arrives (done) |
+| R24 | Audit the build against the plan and security rules, using a private repo with focused commits (done) |
 
-| R22 | Keep only fourteen important selected V3 images in the main folder and archive superseded alternatives; completed |
-| R23 | Start building the project from V3 now; use sample photos, videos and 360° imagery until actual project media are supplied later |
+Arif's first answer was "no personal data". It was later clarified to the four fields in R12, collected only after asking. ID documents, financial records, home addresses, customer uploads and payments stay out of scope.
 
-| R24 | Recheck implementation against the original plan and security concerns; fix gaps, update documents, and create/push a private repository with focused commits |
-
-The initial “no personal data” answer was clarified: the four minimal lead fields in R12 are permitted after asking the visitor's permission. Identity documents, financial records, addresses, customer uploads, and payment information remain outside scope.
-
-## MVP visitor journey
+## Visitor journey (MVP)
 
 1. Open the site and choose Bangla or English.
-2. See the two available listings without needing search or registration.
-3. Open a listing and inspect price, size, location, status, actual photos, video, panorama, and approved details.
-4. Ask the AI assistant a question or use a visible direct contact option.
-5. If desired, submit a separate contact form after a clear privacy explanation and affirmative permission.
-6. Receive a submission confirmation and approved staff contact. Staff follow-up happens outside the website; it is not an appointment or booking.
+2. See both listings without searching or signing up.
+3. Open a listing: price, size, location, status, photos, video, panorama and approved details.
+4. Ask the AI assistant, or use a visible direct contact.
+5. Optionally send the separate inquiry form, after a clear privacy note and explicit permission.
+6. See a confirmation and the approved staff contact. Follow-up happens outside the website; it's not a booking.
 
-## Proposed public pages
+## Pages
 
-| Page | Essential content |
-| --- | --- |
-| Home | Short visual hero, two listing previews with essential facts, Gallery and Virtual Site Visit sections, concise contact path; minimize prose |
-| Projects | Both listings, Project 01 and Project 02, with photo, location, area, BDT price, availability, and details link |
-| Project detail | Accurate specifications, labeled media, location, status, authoritative price, and interest/contact action |
-| Gallery | Approved project photos with bilingual captions, image labels and a lightbox; samples during development |
-| Virtual Site Visit | User-initiated walkthrough and panorama, with project selection and photo fallback |
-| About | Staff-approved company information and relationship to the group |
-| Contact | Approved business contact and office details; no scheduling system |
-| Privacy | Actual data flows, AI provider disclosure, retention, recipients, and privacy contact |
-| Website Terms | Information accuracy, media labels, and distinction between inquiries and contractual transactions |
-
-The AI assistant is a shared feature, not another navigation item. V3 includes a dedicated Gallery/lightbox page and a Virtual Site Visit page linked from the homepage and each project detail; these sample previews are implemented. Location information belongs inside the project detail page. Public land documents/brochure publication remain outside the initial scope. Large media remains user initiated.
-
-## Proposed staff functions
-
-Create and edit the two listings; maintain Bangla and English content; set price and availability; upload approved media; preview and publish content; edit approved public contact details and FAQs. If lead capture is enabled, permitted staff can see new inquiries and mark them contacted or closed. This is a small inquiry inbox, not a full CRM.
-
-Use individual staff accounts and least-privilege permissions. A proposed role matrix appears in SECURITY.md. The user's tentative admin/manager/sub-admin/super-admin labels do not yet establish access rights.
-
-## Listing content requirements
-
-Each listing needs a stable reference, bilingual title and description, locality, verified map coordinates or link, area and units, total BDT price, price basis, availability, date last reviewed, ownership/sales relationship, nearby facilities, verified road/facing information where applicable, and media descriptions.
-
-Use decimal values for money and measurements. Company staff must supply the authoritative area and confirm any katha-to-square-foot conversion convention. Never invent a land conversion, approval, possession date, ownership claim, or investment return. If a price is per katha rather than total, label it explicitly and present a verified total.
-
-Availability is staff-maintained information, not a real-time reservation guarantee. Define draft/published/archived separately from available/under discussion/sold. Proposed status wording needs company approval.
-
-## AI assistant requirements
-
-The assistant answers using current, published plot facts and approved company FAQs. It responds in the visitor's selected language and supports Bangla, English, and mixed-language questions. Authoritative price, area, and availability cards must come from application data.
-
-The assistant may offer a secure contact form but must not submit a lead on the visitor's behalf. Names and phone numbers entered into that form are not sent to the model. The model has no access to staff accounts, customer leads, unpublished listings, private documents, or administrative actions.
-
-The provider, budget, disclosure, and model are recommendations pending company review. AI processing can involve overseas services even though the audience is domestic. Chat must remain useful when the provider fails by showing approved FAQs and staff contact. The requested AI feature is not considered complete merely because a fallback exists.
-
-## MVP acceptance criteria
-
-| Area | Acceptance evidence |
-| --- | --- |
-| Browsing | Both published listings are easy to find; unpublished/archived content cannot leak through public URLs or chat |
-| Content | All prices, areas, locations, claims, translations, and media labels are approved by company staff |
-| Mobile usability | No unintended horizontal scrolling; important tasks remain simple at 320px width; test on actual Android and iPhone devices |
-| Language | Both versions cover pages, controls, forms, validation, AI disclosure, and privacy information; switching preserves the listing |
-| Media | Actual images distinguished from renders; video is user initiated; panorama is user initiated with a usable photo/text fallback |
-| AI | Bilingual fact and adversarial evaluations pass; no invented price/booking promise or access to nonpublic information |
-| Leads | Explicit visitor submission and permission; no contact details in AI requests, URLs, analytics, or application logs |
-| Staff | Permission matrix, MFA, direct URL access, publishing, and lead visibility verified with separate role accounts |
-| Security | Required scans, abuse controls, deployment checks, privacy review, and backup restore test pass |
-| Accessibility | WCAG 2.2 AA target checked through automated checks and manual keyboard, zoom, and screen-reader review |
-| Handover | Teammate can update a listing, handle a lead, restore a backup, and follow documented deployment steps |
-
-## Excluded from this MVP
-
-Customer accounts and dashboards; appointment scheduling; online booking, reservation, or payment; customer file uploads; native mobile apps; advanced search/filtering; clickable plot inventory maps; full CRM/pipeline/team automation; referral/discount programs; ROI or investment prediction; AI recommendations based on customer profiling; push notifications; live-agent chat software; and a blog.
-
-SMS, advertising pixels, third-party analytics, embedded maps, public land-document downloads, and WhatsApp integrations are optional future decisions. A direct telephone contact is sufficient for launch unless the company chooses another channel. Filters can be reconsidered when the catalog grows enough that visitors need them.
-
-## Decisions still needed
-
-| ID | Missing decision | When needed |
+| Page | Must contain | Built? |
 | --- | --- | --- |
-| Q01 | Exact registered entity and approved brand name | Before final legal text and publication |
-| Q02 | Domain, existing host, Python support, monthly hosting and AI budgets | Before deployment/provider commitment |
-| Q03 | Staff responsibilities, named role assignments, publishing approver, and lead recipients | Before protected workflows are implemented |
-| Q04 | Approved business contact, office address, hours, and follow-up expectations | Before contact/handoff is complete |
-| Q05 | Privacy owner, lawful processing basis, lead retention, deletion process, and processor arrangements | Before collecting production customer data |
-| Q06 | Approved AI provider, processing location, terms, billing owner, and transfer assessment | Before sending production conversations |
-| Q07 | Both listings' accurate facts, measurement convention, media files, usage rights, and translations | Before content implementation and launch QA |
-| Q08 | Default language, maintainer's technical skills, browser/device baseline, and remaining V3 screen review. Homepage direction resolved: A / Open Horizon, final for now | During design refinement |
-| Q09 | Company-approved recovery objectives and backup retention | Before production readiness |
+| Home | Short image hero, both listings with key facts, Gallery, Virtual Site Visit, contact path | Yes, with samples |
+| Projects | Both listings: photo, location, area, BDT price, availability, details link | Yes, with samples |
+| Project detail | Facts, labelled media, location, status, price, inquiry button | Yes, with samples; location pending |
+| Gallery | Approved photos with captions in both languages and a photo viewer | Yes, with samples |
+| Virtual Site Visit | Video and panorama that start only when asked, a project picker, photo fallback | Yes, with samples |
+| About | Approved company information and how it relates to the group | Yes; placeholder text |
+| Contact | Approved phone and office address; no scheduling | Yes; contacts pending |
+| Privacy | Real data flows, AI disclosure, retention, recipients, privacy contact | Draft |
+| Terms | Accuracy of information, media labels, inquiry versus contract | Draft |
 
-Unknown decisions remain open; they must not be silently treated as approved defaults.
+The AI assistant is a floating button on every page, not a menu item. Location lives on the project page. Land documents and brochures are out of scope for now. Large media loads only when the visitor asks for it.
+
+## Staff functions
+
+Edit both listings in both languages; set price and availability; upload approved media; preview and publish; edit public contacts and FAQs. Once inquiries are stored, permitted staff can see them and mark them contacted or closed. This is a small inbox, not a CRM.
+
+Each staff member gets their own account with only the permissions they need. The draft role matrix is in [SECURITY.md](SECURITY.md#staff-roles-draft). Arif's role labels (admin, manager, sub-admin, super-admin) don't define access rights yet.
+
+Built so far: listing and FAQ editing, photo upload with rights and approval flags, publish permission, MFA. Not built: draft/review revisions, contact editing, the inquiry inbox.
+
+## Listing content
+
+Each listing needs a stable reference, title and description in both languages, locality, a verified map link or coordinates, area and units, total BDT price and what the price covers, availability, last-reviewed date, ownership or sales relationship, nearby facilities, road and facing details where relevant, and media descriptions.
+
+- Store money and measurements as decimals.
+- The company supplies the official area and confirms its katha-to-square-foot convention. Never invent a conversion, approval, possession date, ownership claim or investment return.
+- If a price is per katha, label it that way and show a verified total.
+- Staff set availability by hand; it is not a live reservation. Keep publication (draft, published, archived) separate from availability (available, unavailable; any other states need company wording).
+
+## AI assistant
+
+- Answers only from published listing facts and approved FAQs, in the visitor's language (Bangla, English or a mix).
+- Price, area and availability cards come from application data, never from the model.
+- May offer the inquiry form but never submits a lead itself. Names and phone numbers from the form never go to the model.
+- No access to staff accounts, leads, unpublished listings, private documents or admin actions.
+- Provider, budget and model are proposals pending company review. Processing may happen outside Bangladesh.
+- If the provider fails, show the approved FAQs and the staff contact. A fallback alone doesn't make the AI feature done.
+
+## Launch criteria
+
+| Area | Evidence needed |
+| --- | --- |
+| Browsing | Both listings are easy to find; unpublished or archived content never leaks through URLs or chat |
+| Content | Company staff approved every price, area, location, claim, translation and media label |
+| Mobile | No sideways scrolling; key tasks are simple at 320 px wide; tested on a real Android phone and iPhone |
+| Language | Both languages cover pages, controls, forms, errors, AI disclosure and privacy text; switching language keeps the listing |
+| Media | Real photos are clearly told apart from renders; video and panorama start only on request and have a fallback |
+| AI | Fact and adversarial tests pass in both languages; no invented prices or promises, no non-public data |
+| Leads | Explicit submission and permission; no contact details in AI requests, URLs, analytics or logs |
+| Staff | Roles, MFA, direct-URL access, publishing and lead visibility tested with separate accounts |
+| Security | Scans, abuse limits, deployment checks, a privacy review and a backup restore test all pass |
+| Accessibility | WCAG 2.2 AA target: automated checks plus manual keyboard, zoom and screen-reader testing |
+| Handover | The teammate can update a listing, handle a lead, restore a backup and follow the deployment steps |
+
+## Out of scope
+
+Customer accounts and dashboards; appointments; booking, reservation or payment; customer uploads; native apps; advanced search or filters; clickable plot maps; CRM or team automation; referral and discount schemes; investment-return predictions; AI profiling of customers; push notifications; live-agent chat; a blog.
+
+Possible later additions: SMS, advertising pixels, third-party analytics, embedded maps, public land documents, WhatsApp. A phone number is enough for launch unless the company wants more. Filters can come back if the catalog grows.
+
+## Open questions
+
+| ID | We still need | Needed before |
+| --- | --- | --- |
+| Q01 | Exact registered name and approved brand name | Final legal text and publishing |
+| Q02 | Domain, current host, Python support, hosting and AI budgets | Deployment and choosing an AI provider |
+| Q03 | Staff responsibilities, named roles, who approves publishing, who receives leads | Building the protected workflows |
+| Q04 | Approved business phone, office address, hours, follow-up promise | Finishing Contact and the handoff |
+| Q05 | Privacy owner, legal basis, lead retention, deletion process, processor contracts | Collecting real customer data |
+| Q06 | AI provider, processing location, terms, billing owner, data-transfer assessment | Sending real conversations |
+| Q07 | Accurate facts, measurement convention, media files, usage rights and translations for both listings | Content and launch testing |
+| Q08 | Default language, the maintainer's skills, supported browsers and devices, sign-off on the V3 pages beyond the homepage | Design refinement |
+| Q09 | Recovery objectives and backup retention | Production readiness |
+
+Unanswered questions stay open. Don't treat them as approved defaults.
+
+### What to ask the company for
+
+| Topic | Ask for |
+| --- | --- |
+| Both projects | Public titles, exact area in both units and the conversion used, total BDT price and what it covers, availability, location link, verified facts |
+| Media | Licensed photos with captions, the walkthrough video, panorama files, capture dates, transcripts if needed |
+| Brand and contact | Approved company wording, logo export, contact person and role, business phone, office address and hours |
+| Staff workflow | Who edits, who reviews and publishes, who reads inquiries, who manages accounts |
+| Hosting and budgets | Domain and hosting details and their owner, Python support, hosting and AI budgets |
+| Privacy and AI | Why we collect data, who receives it, privacy contact, retention and deletion, provider terms, who approves |
+
+The company should send this through its own channels. Never paste credentials into chat or these docs.

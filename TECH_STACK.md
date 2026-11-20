@@ -1,65 +1,65 @@
-# Recommended Technology and Architecture
+# Tech stack
 
-Last updated: 23 October 2026, Asia/Dhaka. Status: first local Django milestone implemented; production infrastructure, AI and inquiry persistence remain planned.
+Last updated 21 November 2026.
 
-## Recommended stack
+## In use
 
-| Layer | Recommendation | Reason |
+| Layer | Choice | Notes |
 | --- | --- | --- |
-| Backend | Django 5.2 LTS, latest security patch | Matches the user's choice and offers a longer support window |
-| Runtime | Python 3.13, latest supported micro release | Supported by Django 5.2; confirm host availability |
-| Frontend | Django templates, semantic HTML, small JavaScript modules | Fast initial rendering, SEO, modest complexity, one application |
-| CSS | Custom CSS with V3 tokens and self-hosted Noto fonts | Implemented to match the approved direction without a framework build step |
-| Database | PostgreSQL 17, latest patch | Reliable relational data, transactional updates, supported production database |
-| Staff administration | Django admin with focused forms and permission checks | Fits two listings and a small staff team without a separate dashboard product |
-| Bilingual content | Django i18n plus explicit Bangla/English fields | Simple for a fixed two-language catalog; human-approved translations |
-| Images | Pillow, validated and normalized uploads, responsive generated sizes | Efficient delivery and safer media handling |
-| Video | HTML video with poster, captions, and bounded approved MP4 uploads | Uses existing assets without another streaming integration |
-| Panorama | Self-hosted Pannellum, pinned release | Uses supplied 360° imagery and loads only when requested |
-| AI | Server-side OpenAI Responses API adapter; GPT-5.4 mini as an evaluation candidate | Free-text bilingual assistance with bounded context and a replaceable provider |
-| Authentication | Django staff authentication plus a maintained MFA integration | No customer authentication; secure staff access is essential |
-| Production process | Gunicorn behind a managed HTTPS ingress, or Nginx on a managed VPS | Conventional Django deployment; final choice depends on the host |
-| Dependencies | A project virtual environment and pinned dependency lock/export, managed with uv | Repeatable local/CI/production environments |
-| Quality and security | Django tests, Ruff, Bandit, pip-audit, Gitleaks, accessibility checks | Small, practical automated checks; detailed policy in SECURITY.md |
+| Language | Python 3.13.16 | Pinned in `.python-version`; CI uses the same version |
+| Framework | Django 5.2.18 | LTS release, supported until April 2028 |
+| Database | PostgreSQL 17 in CI and production; SQLite for local development only | Production refuses SQLite and PostgreSQL without TLS |
+| Frontend | Django templates, custom CSS, one small `site.js` | No build step, no npm |
+| Fonts and viewer | Noto Sans, Noto Sans Bengali, Pannellum 2.5.7, all self-hosted | Sources and checksums in `app/static/vendor/MANIFEST.json` |
+| Images | Pillow | Uploads are checked, rotated from EXIF, re-encoded to JPEG and capped at 2400 px |
+| Staff sign-in | Django auth, django-two-factor-auth (TOTP), django-axes (lockout) | Passwords hashed with scrypt |
+| Static files | WhiteNoise, hashed and compressed | |
+| App server | Gunicorn | In the lock file; not configured yet |
+| Dependencies | `requirements*.in` compiled to hashed `requirements*.lock` with `uv pip compile` | Install with `pip --require-hashes` |
+| Checks | Django tests, Ruff, Bandit, pip-audit, Gitleaks | Run locally and in GitHub Actions |
 
-Django's [support table](https://www.djangoproject.com/download/) lists 5.2 LTS extended support through April 2028. Its [installation FAQ](https://docs.djangoproject.com/en/5.2/faq/install/) supports Python 3.13 and recommends PostgreSQL for production. PostgreSQL 17 is supported through November 2029 according to its [versioning policy](https://www.postgresql.org/support/versioning/). Recheck exact patches at implementation and each release.
+## Code layout
 
-The first build uses custom CSS, semantic HTML, native dialogs and a small JavaScript module. Fonts, viewer scripts and licenses are bundled locally. No npm build step is needed. Apply the DESIGN.md responsive, focus, contrast and localization requirements; full accessibility verification remains a later release task.
+```text
+app/
+  config/      settings, URLs, MFA-only admin site, security-headers middleware
+  projects/    Project, ProjectImage and FAQ models; admin; protected image view; seed_demo command
+  website/     public views, inquiry form, bilingual copy (copy.py), template filters
+  templates/   base layout, pages, components, staff sign-in, admin branding
+  static/      CSS, JS, fonts, sample images and videos, vendored Pannellum
+  tests/       test_foundation.py (pages, privacy, staff, media), test_security.py (config, headers, sign-in)
+scripts/
+  dev.sh                migrate, seed and run on 127.0.0.1:8000
+  check_production.py   Django deployment checks against a synthetic production config
+  install-gitleaks.sh   installs a checksum-pinned Gitleaks into .runtime/tools
+  prepare_assets.py     one-off WebP exports and vendored package downloads
+```
 
-## Alternatives considered
+Planned apps: `inquiries/` (form, consent record, staff inbox) and `assistant/` (public-fact context, provider adapter, quotas).
 
-| Option | Assessment |
+## Data model
+
+Built:
+
+| Model | Key fields |
 | --- | --- |
-| React or Next.js with a Django API | Adds two application layers, API/auth concerns, and build/deployment work for a small content site; revisit for genuinely complex client workflows |
-| Tailwind CSS | Revisit only if the maintainer needs it; the current custom CSS matches V3 without an extra build dependency |
-| Plain custom CSS only | Selected for the first implementation; keeps the V3 presentation and dependency surface small |
-| HTMX | Useful for later partial updates; unnecessary for two listings and a small chat module |
-| Wagtail | Useful for a large editorial site; adds CMS concepts and dependencies not needed for the current inventory |
-| SQLite | Used for local preview/tests because PostgreSQL/Docker are unavailable here; PostgreSQL integration must pass before staging/production |
-| MySQL | Supported by Django, but offers no clear advantage for this new project |
+| Project | slug; title, location and description in `_en` and `_bn`; `price_bdt`, `area_katha`, `area_sqft` (decimals, database-checked above zero); publication (draft, published, archived); availability; `is_sample`; order |
+| ProjectImage | UUID id; project; image (re-encoded JPEG); caption and alt text in both languages; `illustrative`, `rights_confirmed`, `approved_for_publication`; order |
+| FAQ | question and answer in both languages; published; order |
 
-Do not introduce a vector database, LangChain, an autonomous agent framework, microservices, Redis, Celery, Elasticsearch, or a REST framework at the start. Add a dependency only for a concrete requirement and record the maintenance, security, license, and privacy implications.
+Planned:
 
-## Proposed application modules
+- **Inquiry:** optional name, phone, project, short message, consent time and notice version, status, retention expiry.
+- **SiteContact:** approved public contacts.
+- **AuditEvent:** staff id, action, record and time, with no lead contents.
 
-    config/       environment settings, URLs, deployment configuration
-    website/      public company pages, approved contacts, FAQ content
-    projects/     implemented listings, bilingual facts, public queries, photo uploads, publication gate
-    inquiries/    contact form, consent record, restricted staff inbox
-    assistant/    public fact context, provider adapter, quotas, safe responses
-    templates/    shared layout and accessible page/components
-    static/       project CSS/JS, approved logo exports, vendored libraries/fonts
-    tests/        integration, access control, privacy, abuse, and AI evaluation
-
-The implemented code is in app/: config/, website/, projects/, templates/, static/ and tests/. Separate inquiries/ and assistant/ services are still planned. See app/README.md for commands and limits. Runtime Django 5.2.18/Python 3.13.16, pinned dependencies and PostgreSQL CI are present; the remote PostgreSQL run has passed. The patched runtime is pinned in .python-version. Staged/full-history Gitleaks, dependency scans and synthetic production checks are included.
+Timestamps are stored in UTC and shown in Asia/Dhaka time. Internal keys stay separate from labels staff can edit.
 
 ## Data boundaries
 
-Public browser requests go to Django. Django reads only published plot/company data for public responses. Staff routes use authentication, MFA, and explicit permissions. PostgreSQL and storage are reached from the server and are not public administration interfaces.
+Public requests read only published data. Staff routes need a login, MFA and the right permission. Only the server can reach the database and file storage.
 
-The assistant's service can build a small context from the two approved listings and FAQs. An AI provider request contains that public context and bounded, screened conversational input. It must not contain lead-form fields, staff credentials, private documents, internal notes, or the full database.
-
-Interest submission goes through a separate Django form into the restricted inquiry table. The model has no tool or route to query or modify leads. Staff review the inbox manually. A later email notification should contain a link to the protected inbox rather than customer details.
+The future AI feature gets a small context built from published listings and FAQs, plus screened chat input. It never gets inquiry fields, credentials, private documents or database access. Inquiries go through a separate form into a restricted table, and staff read them in the inbox. Email alerts should link to the inbox instead of containing customer details.
 
 ```mermaid
 flowchart LR
@@ -75,55 +75,45 @@ flowchart LR
     M[Staff with MFA and permissions] --> I
 ```
 
-The diagram shows intended data boundaries, not existing services. Lead-form details stay on the form/inbox path and do not enter the AI path.
+The diagram shows the intended design. Only the public pages and the staff admin exist today.
 
-## Proposed data model
+## Publishing
 
-| Entity | Minimum useful information |
-| --- | --- |
-| Plot | Stable ID/slug, bilingual title/description, location, approved coordinates, area, unit convention, decimal price, price basis, availability, publishing state, review/update timestamps |
-| PlotMedia | Plot association, media type, file reference, bilingual caption/alternative text, actual-photo/render label, review state, order |
-| FAQ / SiteContact | Approved bilingual public facts and public business contacts |
-| Inquiry | Optional name, callback phone, plot reference, optional bounded message, consent timestamp/text version, created time, handling status, retention expiry |
-| Staff user | Individual Django account, MFA enrollment, group permissions; no customer user accounts |
-| Audit event | Staff actor ID, action, affected record reference, timestamp; avoid copying lead contents |
+Today:
 
-The user renamed the two public listings Project 01 and Project 02 on 23 October. Use Projects wording in UI and public-facing assistant answers. The implemented internal models are Project, ProjectImage and FAQ; Inquiry, SiteContact and audit-event work remains planned. The public rename alone does not require separate parent Project and child Plot models or a hierarchy. Store timestamps in UTC and show staff dates in Asia/Dhaka. Store money and measurements using decimal types. Keep internal primary keys independent of editable public labels.
+- Only users with `projects.publish_project` can publish a project or FAQ, approve photos, or change or delete live records, including through bulk delete. Other staff can edit drafts.
+- A photo is public only when `rights_confirmed` and `approved_for_publication` are both set and its project is published.
+- Unapproved photos are served only to MFA-verified staff with view permission, with `Cache-Control: private, no-store`.
 
-## Content and publishing
+Planned: draft revisions with preview and review, so editing never changes the live version until it's published.
 
-Target workflow: staff create or update content, preview it, and publish only after required facts and both language versions are approved. First milestone: MFA and explicit publication permission are enforced; non-publishers cannot edit live records, and permitted managers edit the current row directly. Separate draft revisions/review remain to be built. The exact editor/approver split awaits role confirmation. Keep archive state separate from sales status. Restrict public queries, chat context, sitemaps, and media exposure consistently.
+## AI (planned)
 
-Media uploaded by staff still needs validation. Re-encode supported images, strip unnecessary metadata, reject active file types, validate size/dimensions, and use generated storage names. Set separate limits for ordinary photos, panoramas, and videos after inspecting the supplied assets. Do not expose private documents through a public media path.
+- Candidate: OpenAI Responses API behind a small adapter, so the provider can be swapped, evaluating GPT-5.4 mini. Not decided. Test Bangla, English and mixed questions, accuracy, speed and cost first, then pin a model version.
+- No web browsing, file search, URL fetching, code execution or admin tools.
+- Timeouts, limited turns and tokens, global and per-session quotas, and a spending cap the app enforces. Provider errors show a bilingual fallback message, never a stack trace.
+- Chat history stays in the browser and is treated as untrusted. No stored transcripts. Turn the provider's response storage off where possible. That still isn't zero retention, since abuse monitoring may apply. Check the actual account terms and Bangladesh's data-transfer rules first.
 
-## AI recommendation and constraints
+## Hosting (not chosen)
 
-Recommend an OpenAI Responses API integration through a small provider adapter, subject to company approval of budget and data handling. [GPT-5.4 mini](https://developers.openai.com/api/docs/models/gpt-5.4-mini) is a documented efficient model candidate, not a proven best Bangla model for this use case. Select and pin an available version only after testing representative Bangla, English, and mixed-language questions, factual accuracy, latency, and cost.
+The company hasn't shared its domain or hosting details. Don't assume its current WordPress-style hosting can run Django. Prefer a managed Python host with PostgreSQL, TLS, secret management, persistent or object storage, tested backups and logs; a managed VPS is the fallback. Keep staging and production separate, with synthetic data in staging. Leave existing domains alone until the company approves a migration plan with a rollback.
 
-Do not enable web browsing, file search, arbitrary URL fetching, code execution, or administrative tools. Use public, approved facts supplied directly by the application. Keep prompt/configuration versions so an evaluation can be repeated after changes.
-
-Use explicit timeouts, bounded turns and input/output tokens, global and per-session quotas, and an application-enforced spend ceiling. Start with non-streamed replies for simplicity unless measured latency warrants streaming; provider exceptions must resolve to a useful bilingual fallback, not a trace or sensitive payload.
-
-Keep conversational history in volatile browser memory where practical, with bounded server processing and no durable transcript store. Treat any history received from the browser as untrusted input. Avoid provider conversation objects and persisted response chains for this MVP. Set response storage off where supported and distinguish this from provider abuse-monitoring retention.
-
-The provider's [data controls](https://developers.openai.com/api/docs/guides/your-data) state that API data is not used for training by default, but standard abuse-monitoring retention can still apply. Storage settings alone do not establish zero retention. Assess actual account settings, terms, processing location, and Bangladesh transfer requirements before production use.
-
-## Current verification
-
-See [SECURITY_AUDIT.md](SECURITY_AUDIT.md) for plan coverage, fixes and evidence. WSGI defaults to production, rejects weak/missing secrets or wildcard/absent hosts, requires PostgreSQL with TLS, and applies secure cookies and HTTPS settings. Local manage.py commands explicitly default to development. Synthetic configuration checks leave HSTS subdomain/preload decisions visible until company domains are known; no deployed configuration has been verified.
-
-## Hosting proposal
-
-The company has not supplied its domain/hosting information. Do not assume the existing WordPress-oriented hosting can run Django. Request a provider/plan inventory through the company without asking for credentials in chat.
-
-Prefer a managed Python application host with PostgreSQL, verified TLS, secret management, persistent/object storage, backup restoration, log controls, and accessible support. A managed VPS is a fallback if budget or location requires it and the teammate can operate it. Hosting location needs a privacy review, not a guess that domestic customers automatically require or exempt a particular region.
-
-Separate staging and production, credentials, databases, and billing. Use synthetic staging data. Existing domains and websites remain untouched until the company approves a concrete migration plan with backup, redirects, DNS change, and rollback.
+Before deploying, fix open findings A07–A09 in [SECURITY_AUDIT.md](SECURITY_AUDIT.md#open-findings): logging, the health-check redirect and the proxy-aware client IP.
 
 ## Performance and SEO
 
-Render readable content on the server. Generate responsive photos; avoid sending the 7284px logo unchanged. Reserve media dimensions to prevent layout movement. Defer chat code and large media until needed. Never include an API secret in browser assets.
+- HTML is rendered on the server. Image sizes are reserved to avoid layout shift. Heavy media and viewer code load only on demand. No secrets in browser code.
+- Targets once real traffic exists: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1 (75th percentile).
+- At launch: titles and descriptions in each language, canonical and alternate-language links, a sitemap of published pages, and social preview images. While everything is a sample, pages deliberately send `noindex,nofollow`.
 
-Use descriptive URLs, bilingual titles/descriptions, correct page language, canonical URLs, alternate language links, and a sitemap containing published pages only. Do not invent reviews or structured-data claims. Add social preview images from licensed company assets.
+## Alternatives we rejected
 
-Adopt [Core Web Vitals](https://web.dev/articles/vitals) targets of LCP at most 2.5s, INP at most 200ms, and CLS at most 0.1 at the 75th percentile once enough real visits exist. Before launch, use controlled mobile lab tests and record their conditions; lab scores cannot prove field performance. Initial page media budgets and panorama/video limits are set after asset inspection.
+| Option | Why not, for now |
+| --- | --- |
+| React/Next.js with an API | Two apps and an API for a small content site |
+| Tailwind or Bootstrap | An extra build step or defaults to override; custom CSS matches V3 |
+| HTMX | Not needed for two listings |
+| Wagtail | CMS concepts we don't need yet |
+| MySQL | No advantage over PostgreSQL here |
+
+Don't add a vector database, LangChain, an agent framework, microservices, Redis, Celery, Elasticsearch or a REST framework without a concrete need. For any new dependency, record its maintenance, security, licence and privacy cost.
